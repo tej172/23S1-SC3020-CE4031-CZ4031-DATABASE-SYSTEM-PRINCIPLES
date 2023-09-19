@@ -58,11 +58,23 @@ class Disk{
             }
             
             int offset = currBlockMemUsed;
-            currBlockMemUsed = currBlockMemUsed + offset;    
+            currBlockMemUsed = currBlockMemUsed + recordSize;    
 
             Address record = {currBlockNumber(), offset};
             return record;
         };        
+
+        bool deleteRecord(Address address, std::size_t sizeToDelete){
+            try{
+                // Remove record from block.
+                void *addressToDelete = (char*)startDisk + address.blkNumber * blockSize + address.offset;
+                std::memset(addressToDelete, '\0', sizeToDelete);
+                return true;
+            }catch (...){
+                std::cout << "[ERROR]: Could not remove record block. \n";
+                return false;
+            };
+        }
 
         void * loadDataFromDisk(Address address, std::size_t recordSize){
             void *data = operator new(recordSize);
@@ -78,13 +90,18 @@ class Disk{
             return address;
         }
 
+        bool UpdateDisk(void * itemAddress,  std::size_t recordSize, Address address){
+            std::memcpy((char*)startDisk + address.blkNumber * blockSize + address.offset, itemAddress, recordSize);
+            return true;
+        }
+
         int memoryUsed(){
             ptrdiff_t sizeUsed = (char *)block + currBlockMemUsed -(char *)startDisk;
             return sizeUsed;
         };
 
         int currBlockNumber(){
-            int blockNum = floor(memoryUsed());
+            int blockNum = floor(memoryUsed() / blockSize);
             return blockNum;
         };
 
