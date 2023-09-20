@@ -134,44 +134,25 @@ int main(void) {
 	BPTree->insert(*address, 3);
 	BPTree->insert(*address, 5);
 	BPTree->insert(*address, 7);
-	BPTree->print();
-	std::cout << "\n";
-	std::cout << "\n";
 
 	BPTree->insert(*address, 13);
 	BPTree->insert(*address, 13);
-	BPTree->print();
-	std::cout << "\n";
-	std::cout << "\n";
-
-
-
 	BPTree->insert(*address, 23);
 	BPTree->insert(*address, 23);
-	BPTree->print();
-	std::cout << "\n";
-	std::cout << "\n";
-
-
 	BPTree->insert(*address, 25);
 	BPTree->insert(*address, 25);
-	BPTree->print();
-	std::cout << "\n";
-	std::cout << "\n";
-
 	BPTree->insert(*address, 26);
 	BPTree->insert(*address, 37);
-	BPTree->print();
-	std::cout << "\n";
-	std::cout << "\n";
+	BPTree->insert(*address, 41);
+	BPTree->insert(*address, 43);
+	BPTree->insert(*address, 47);	
 
+	// BPTree->print(BPTree->root);
 
-	// BPTree->insert(*address, 41);
-	// BPTree->insert(*address, 43);
-	// BPTree->insert(*address, 47);	
-
-	BPTree->print();
-
+	for (int i = 13; i < 38; i++){
+		std::cout << i << "\n ";
+		BPTree->findSearchKey(i);	
+	}	
 
 	puts("Hello World!!!");
 
