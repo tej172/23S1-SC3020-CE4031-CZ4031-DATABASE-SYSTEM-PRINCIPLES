@@ -130,29 +130,35 @@ int main(void) {
 	//Testing inserting B+ Tree
 	BPlusTree *BPTree = new BPlusTree(3);
 	Address * address = new Address();
-	BPTree->insert(*address, 2);
-	BPTree->insert(*address, 3);
-	BPTree->insert(*address, 5);
-	BPTree->insert(*address, 7);
 
-	BPTree->insert(*address, 13);
-	BPTree->insert(*address, 13);
-	BPTree->insert(*address, 23);
-	BPTree->insert(*address, 23);
-	BPTree->insert(*address, 25);
-	BPTree->insert(*address, 25);
-	BPTree->insert(*address, 26);
-	BPTree->insert(*address, 37);
-	BPTree->insert(*address, 41);
-	BPTree->insert(*address, 43);
-	BPTree->insert(*address, 47);	
+	
+	// BPTree->insert(*address, 2);
+	// BPTree->insert(*address, 3);
+	// BPTree->insert(*address, 5);
+	// BPTree->insert(*address, 7);
 
-	// BPTree->print(BPTree->root);
+	// BPTree->insert(*address, 13);
+	// BPTree->insert(*address, 13);
+	// BPTree->insert(*address, 23);
+	// BPTree->insert(*address, 23);
+	// BPTree->insert(*address, 25);
+	// BPTree->insert(*address, 25);
+	// BPTree->insert(*address, 26);
+	// BPTree->insert(*address, 37);
+	// BPTree->insert(*address, 41);
+	// BPTree->insert(*address, 43);
+	// BPTree->insert(*address, 47);	
 
-	for (int i = 13; i < 38; i++){
-		std::cout << i << "\n ";
-		BPTree->findSearchKey(i);	
-	}	
+	// // BPTree->print(BPTree->root);
+
+	// for (int i = 13; i < 38; i++){
+	// 	std::cout << i << "\n ";
+	// 	BPTree->findSearchKey(i);	
+	// }
+
+	//test for teg delete
+
+	BPTree->deleteNode(1);
 
 	puts("Hello World!!!");
 

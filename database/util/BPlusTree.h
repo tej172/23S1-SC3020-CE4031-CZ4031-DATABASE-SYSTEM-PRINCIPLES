@@ -322,8 +322,15 @@ public:
     std::cout << "[KEY NOT FOUND] \n";
     return -1;
   }
+  void deleteNode(float key)
+  {
+    if(root == NULL){
+        std::cout << "[ERROR] Tree is empty. \n";
+        return;
+    }else{
 
-  
+    }
+  }
 };
 
 #endif
