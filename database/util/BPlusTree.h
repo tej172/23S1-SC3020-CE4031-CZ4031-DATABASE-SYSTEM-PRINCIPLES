@@ -328,6 +328,100 @@ public:
         std::cout << "[ERROR] Tree is empty. \n";
         return;
     }else{
+        Node *currNode = root;
+        Node *parent;
+
+        int leftSibling, rightSibling;
+        while(currNode->isLeaf==false)
+        {
+            parent = currNode; //modi_1
+            for(int i = 0; i < currNode->currKeyNum; i++)
+            {
+                // modi_1
+                leftSibling = i-1;
+                rightSibling = i+1;
+                if(key < currNode->keys[i])
+                {
+                    currNode = currNode->nodePtrs[i];
+                    break;
+                }
+                if(i == (currNode->currKeyNum - 1))
+                {
+                    currNode = currNode->nodePtrs[i+1];
+                    break;
+                }
+            }
+        }
+        bool flagFound = false;
+        int leafPosition;
+        for (leafPosition = 0; leafPosition < currNode->currKeyNum; leafPosition++)
+        {
+            if (currNode->keys[leafPosition] == key)
+            {
+                flagFound = true;
+                break;
+            }
+        }
+        if(flagFound==false){
+            std::cout << "==================================\n";
+            std::cout << "[KEY NOT FOUND]: Nothing to delete in tree";
+            std::cout << "\n==================================\n";
+            return;
+        }else{
+            // std::cout<< "=========\nfound key";
+            // std::cout<< "\nkey: " << key << "\nleaf position: "<< leafPosition <<"\n=========\n";
+            std::cout << "=========\nbefore delete\n=========\n";
+
+            for(int i=leafPosition; i<currNode->currKeyNum;i++){
+                currNode->keys[i] = currNode->keys[i+1];
+                //currNode->addressPtrs[i] = currNode->addressPtrs[i+1];
+            }
+            currNode->currKeyNum -= 1;
+            std::cout << "=========\nafter delete\n=========\n";
+            if(currNode==root){
+                //if no keys left (i.e. all keys deleted)
+                //cout<<"Deleted"
+                for(int i=0; i<currNode->currKeyNum; i++){
+                    currNode->nodePtrs[i] =NULL;
+                    //cout<<"Address of node["<<i<<"] is :"<<currNode->addressPtrs[i]->pageNo <<" ";
+                }
+                if(currNode->currKeyNum==0)
+                {
+                    //modi2 (switch)
+                    delete[] currNode->nodePtrs;
+                    delete[] currNode->keys;
+                    delete currNode;
+                    std::cout << "=========\ntree DELETED\n=========\n";
+                }
+                return; //tree deleted                        
+            }
+            currNode->nodePtrs[currNode->currKeyNum] = currNode->nodePtrs[currNode->currKeyNum+1];
+            currNode->nodePtrs[currNode->currKeyNum+1] = NULL;
+            if(currNode->currKeyNum >= (MAX_KEY+1)/2){
+                std::cout << "=========\nno underflow\n=========\n";
+                return;
+            }
+
+            if(leftSibling >=0){
+                Node *leftNode = parent->nodePtrs[leftSibling];
+                if(leftNode->currKeyNum>=((MAX_KEY+1)/2+1)){
+                    for(int i = currNode->currKeyNum; i>0; i--){
+                        currNode->keys[i] = currNode->keys[i-1];
+                        //currNode->addressPtrs[i] = currNode->addressPtrs[i-1];
+                    }
+                    currNode->currKeyNum++;
+                    currNode->nodePtrs[currNode->currKeyNum] = currNode->nodePtrs[currNode->currKeyNum-1];
+                    currNode->nodePtrs[currNode->currKeyNum -1] =NULL;
+                }
+
+
+            }
+
+
+
+        }
+
+
 
     }
   }

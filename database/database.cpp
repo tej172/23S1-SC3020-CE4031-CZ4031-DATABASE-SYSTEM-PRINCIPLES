@@ -156,9 +156,28 @@ int main(void) {
 	// 	BPTree->findSearchKey(i);	
 	// }
 
-	//test for teg delete
+	// test for teg delete
+	 BPTree->insert(*address, 1);
+	 BPTree->insert(*address, 4);
+	 BPTree->insert(*address, 5);
+	 BPTree->insert(*address, 7);
 
-	BPTree->deleteNode(1);
+	BPTree->insert(*address, 10);
+	BPTree->insert(*address, 17);
+	BPTree->insert(*address, 19);
+	BPTree->insert(*address, 20);
+	BPTree->insert(*address, 21);
+	BPTree->insert(*address, 25);
+	BPTree->insert(*address, 31);
+	// BPTree->insert(*address, 25);
+	// BPTree->insert(*address, 25);
+	// BPTree->insert(*address, 31);
+	// BPTree->insert(*address, 31);
+	//BPTree->print(BPTree->root);
+
+	// std::cout<<"works";
+	BPTree->deleteNode(7); // no key found should delete
+	//std::cout<<"now";
 
 	puts("Hello World!!!");
 
