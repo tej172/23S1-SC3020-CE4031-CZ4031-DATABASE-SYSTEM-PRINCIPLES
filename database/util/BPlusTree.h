@@ -5,7 +5,10 @@
 
 
 #include <iostream>
+#include <climits>
+#include <fstream>
 #include <cmath>
+#include <sstream>
 #include <queue>
 
 class BPlusTree
@@ -322,6 +325,30 @@ public:
     std::cout << "[KEY NOT FOUND] \n";
     return -1;
   }
+
+  void printTree(Node *displayNode){
+    std::cout << "===============================\n";
+    std::cout << "B+ Tree Print Out\n";
+    std::cout << "===============================\n";
+
+    displayBT(displayNode);
+  }
+
+  void displayBT(Node *displayNode){
+    //display(root);
+    if(displayNode != NULL){
+        for(int i = 0; i < displayNode->currKeyNum; i++){
+            std::cout << displayNode->keys[i] << " ";
+        }
+        std::cout << "\n";
+        if(displayNode->isLeaf == false){
+            for(int i = 0; i < displayNode->currKeyNum + 1; i++){
+                displayBT(displayNode->nodePtrs[i]);
+            }
+        }
+    }
+    std::cout << "===============================\n";
+  }
   void deleteNode(float key)
   {
     if(root == NULL){
@@ -412,17 +439,235 @@ public:
                     currNode->currKeyNum++;
                     currNode->nodePtrs[currNode->currKeyNum] = currNode->nodePtrs[currNode->currKeyNum-1];
                     currNode->nodePtrs[currNode->currKeyNum -1] =NULL;
+                    currNode->keys[0] = leftNode->keys[leftNode->currKeyNum -1];
+                    //currNode->addressPtrs[0] = leftNode->addressPtrs[leftNode->currKeyNum -1];
+                    leftNode->currKeyNum--;
+                    leftNode->nodePtrs[leftNode->currKeyNum]=currNode;
+                    leftNode->nodePtrs[leftNode->currKeyNum + 1]=NULL;
+                    parent->keys[leftSibling] = currNode->keys[0];
+                    return;
                 }
+            }
+            if (rightSibling <= parent->currKeyNum){
+                Node *rightNode = parent->nodePtrs[rightSibling];
+                if(rightNode->currKeyNum >= (((MAX_KEY+1)/2)+1)){
+                    currNode->currKeyNum++;
+
+                    currNode->nodePtrs[currNode->currKeyNum] = currNode->nodePtrs[currNode->currKeyNum -1];
+                    currNode->nodePtrs[currNode->currKeyNum -1] = NULL;
+                    currNode->keys[currNode->currKeyNum - 1] = rightNode->keys[0];
+                    //currNode->addressPtrs[currNode->currKeyNum -1] = rightNode->addressPtrs[0];
+                    rightNode->currKeyNum--;
+
+                    rightNode->nodePtrs[rightNode->currKeyNum] =rightNode->nodePtrs[rightNode->currKeyNum +1];
+                    rightNode->nodePtrs[rightNode->currKeyNum +1] = NULL;
+                    // currNode->nodePtrs[currNode->currKeyNum] = rightNode->nodePtrs[0];
+                    // rightNode->nodePtrs[0] = rightNode->nodePtrs[1];
+                    // rightNode->nodePtrs[rightNode->currKeyNum] = NULL;
+
+                    for(int i=0; i<rightNode->currKeyNum; i++){
+                        rightNode->keys[i] = rightNode->keys[i+1];
+                        //rightNode->addressPtrs[i] = rightNode->addressPtrs[i+1];
+                    }
+                    // rightNode->currKeyNum--;
+                    parent->keys[rightSibling-1] = rightNode->keys[0];
+                    return;
+                }
+            }
+            if(leftSibling>=0){
+                Node *leftNode =parent->nodePtrs[leftSibling];
+                for(int i=leftNode->currKeyNum, j=0; j<currNode->currKeyNum; i++, j++){
+                    leftNode->keys[i] = currNode->keys[j];
+                    //leftNode->addressPtrs[i] = currNode->addressPtrs[j];
+                }
+                leftNode->nodePtrs[leftNode->currKeyNum] = NULL;
+                leftNode->currKeyNum += currNode->currKeyNum;
+                leftNode->nodePtrs[leftNode->currKeyNum] = currNode->nodePtrs[currNode->currKeyNum];
+                //delete currNode;
+                deleteInternal(parent->keys[leftSibling], parent, currNode);
+                delete[] currNode->keys;
+                delete[] currNode->nodePtrs;
+                delete currNode;
+            }else if(rightSibling <= parent->currKeyNum){
+                Node *rightNode =  parent->nodePtrs[rightSibling];
+                for(int i =currNode->currKeyNum, j=0; j<rightNode->currKeyNum; i++,j++){
+                    currNode->keys[i] = rightNode->keys[j];
+                    //currNode->addressPtrs[i] = rightNode->addressPtrs[j];
+                }
+                currNode->nodePtrs[currNode->currKeyNum] =NULL;
+                currNode->currKeyNum += rightNode->currKeyNum;
+                currNode->nodePtrs[currNode->currKeyNum]=rightNode->nodePtrs[rightNode->currKeyNum];
+                //delete rightNode;
+                std::cout << "==============\nMerging Leaf Node\n==============\n";
+                deleteInternal(parent->keys[rightSibling-1], parent, rightNode);
+                delete[] rightNode->keys;
+                delete[] rightNode->nodePtrs;
+                delete rightNode;
+            }
+        }
+    }
+  }
+  void deleteInternal(float key, Node *currNode, Node *child){ //touch-upcode
+    if (currNode == root)
+    {
+        if (currNode->currKeyNum == 1)
+        {
+            if (currNode->nodePtrs[1] == child)
+            {
+                delete[] child->keys;
+                delete[] child->nodePtrs;
+                delete child;
 
 
+                root = currNode->nodePtrs[0];
+                delete[] currNode->keys;
+                delete[] currNode->nodePtrs;
+
+                std::cout << "===============================\nRoot Node Has Been Changed\n===============================\n";
+                delete currNode;
+                
+                return;
+            }
+            else if (currNode->nodePtrs[0] == child)
+            {
+                delete[] child->keys;
+                delete[] child->nodePtrs;
+                delete child;
+                root = currNode->nodePtrs[1];
+                delete[] currNode->keys;
+                delete[] currNode->nodePtrs;
+
+                std::cout << "===============================\nRoot Node Has Been Changed\n===============================\n";
+                delete currNode;
+                
+                
+                return;
+            }
+        }
+    }
+    int position;
+    for (position = 0; position < currNode->currKeyNum; position++){
+        if (currNode->keys[position] == key){
+            break;
+        }
+    }
+    for (int i = position; i < currNode->currKeyNum; i++){
+        currNode->keys[i] = currNode->keys[i + 1];
+    }
+    for (position = 0; position < currNode->currKeyNum + 1; position++){
+        if (currNode->nodePtrs[position] == child){
+            break;
+        }
+    }
+    for (int i = position; i < currNode->currKeyNum + 1; i++){
+        currNode->nodePtrs[i] = currNode->nodePtrs[i + 1];
+    }
+
+    //decrement current node num of keys 
+    currNode->currKeyNum--;
+
+    if (currNode->currKeyNum >= (MAX_KEY + 1) / 2 - 1){
+        return;
+    }
+
+    if (currNode == root){
+        return;
+    }
+        
+    Node *parent = findParent(root, currNode);
+    int leftSibling, rightSibling;
+
+    // for (position = 0; position < parent->currKeyNum + 1; position++){
+    //     if (parent->nodePtrs[position] == currNode){
+    //         leftSibling = position - 1;
+    //         rightSibling = position + 1;
+    //         break;
+    //     }
+    // }
+    //if (!isLeftChild(parent)){
+
+    for (position = 0; position < parent->currKeyNum + 1; position++){
+        if (parent->nodePtrs[position] == currNode){
+            leftSibling = position - 1;
+            rightSibling = position + 1;
+            break;
+        }
+    }
+    if (leftSibling >= 0){
+        Node *leftNode = parent->nodePtrs[leftSibling];
+
+        if (leftNode->currKeyNum >= (MAX_KEY + 1) / 2){
+            for (int i = currNode->currKeyNum; i > 0; i--){
+                currNode->keys[i] = currNode->keys[i - 1];
+            }
+            currNode->keys[0] = parent->keys[leftSibling];
+            parent->keys[leftSibling] = leftNode->keys[leftNode->currKeyNum - 1];
+            for (int i = currNode->currKeyNum + 1; i > 0; i--){
+                currNode->nodePtrs[i] = currNode->nodePtrs[i - 1];
+            }
+            currNode->nodePtrs[0] = leftNode->nodePtrs[leftNode->currKeyNum];
+            currNode->currKeyNum++;
+            leftNode->currKeyNum--;
+            //updateHeightAndBalanceFactor(currNode);//update height and balance factor
+            
+            return;
+        }
+    }
+    if (rightSibling <= parent->currKeyNum)
+    {
+        Node *rightNode = parent->nodePtrs[rightSibling];
+        if (rightNode->currKeyNum >= (MAX_KEY + 1) / 2){
+
+            currNode->keys[currNode->currKeyNum] = parent->keys[position];
+            parent->keys[position] = rightNode->keys[0];
+
+            for (int i = 0; i < rightNode->currKeyNum - 1; i++){
+                rightNode->keys[i] = rightNode->keys[i + 1];
             }
 
-
-
+            currNode->nodePtrs[currNode->currKeyNum + 1] = rightNode->nodePtrs[0];
+            
+            for (int i = 0; i < rightNode->currKeyNum; ++i){
+                rightNode->nodePtrs[i] = rightNode->nodePtrs[i + 1];
+            }
+            currNode->currKeyNum++;
+            rightNode->currKeyNum--;
+            return;
+        }
+    }
+    if (leftSibling >= 0)
+    {
+        Node *leftNode = parent->nodePtrs[leftSibling];
+        leftNode->keys[leftNode->currKeyNum] = parent->keys[leftSibling];
+        for (int i = leftNode->currKeyNum + 1, j = 0; j < currNode->currKeyNum; j++){
+            leftNode->keys[i] = currNode->keys[j];
+        }
+        for (int i = leftNode->currKeyNum + 1, j = 0; j < currNode->currKeyNum + 1; j++){
+            leftNode->nodePtrs[i] = currNode->nodePtrs[j];
+            currNode->nodePtrs[j] = NULL;
         }
 
-
-
+        leftNode->currKeyNum += currNode->currKeyNum + 1;
+        currNode->currKeyNum = 0;
+        deleteInternal(parent->keys[leftSibling], parent, currNode);
+    }
+    else if (rightSibling <= parent->currKeyNum)
+    {
+        Node *rightNode = parent->nodePtrs[rightSibling];
+        //cout << "right node: "; 
+        //printKeys(rightNode);cout<<endl;
+        currNode->keys[currNode->currKeyNum] = parent->keys[rightSibling - 1];
+        for (int i = currNode->currKeyNum + 1, j = 0; j < rightNode->currKeyNum; j++){
+            currNode->keys[i] = rightNode->keys[j];
+        }
+        for (int i = currNode->currKeyNum + 1, j = 0; j < rightNode->currKeyNum + 1; j++)
+        {
+            currNode->nodePtrs[i] = rightNode->nodePtrs[j];
+            rightNode->nodePtrs[j] = NULL;
+        }
+        currNode->currKeyNum += rightNode->currKeyNum + 1;
+        rightNode->currKeyNum = 0;
+        deleteInternal(parent->keys[rightSibling - 1], parent, rightNode);
     }
   }
 };

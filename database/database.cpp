@@ -169,6 +169,8 @@ int main(void) {
 	BPTree->insert(*address, 21);
 	BPTree->insert(*address, 25);
 	BPTree->insert(*address, 31);
+
+	BPTree->printTree(BPTree->root);
 	// BPTree->insert(*address, 25);
 	// BPTree->insert(*address, 25);
 	// BPTree->insert(*address, 31);
@@ -176,7 +178,21 @@ int main(void) {
 	//BPTree->print(BPTree->root);
 
 	// std::cout<<"works";
-	BPTree->deleteNode(7); // no key found should delete
+	// BPTree->deleteNode(1); // no key found should delete
+	// BPTree->deleteNode(4);
+	// BPTree->deleteNode(5);
+	// BPTree->deleteNode(7);
+	BPTree->deleteNode(10);
+	// BPTree->deleteNode(17);
+	//BPTree->deleteNode(19);
+	//BPTree->deleteNode(20);
+	BPTree->deleteNode(21);
+	BPTree->deleteNode(25);
+	BPTree->deleteNode(31);
+	// BPTree->deleteNode(25);
+
+	BPTree->printTree(BPTree->root);
+
 	//std::cout<<"now";
 
 	puts("Hello World!!!");
