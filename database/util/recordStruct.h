@@ -19,6 +19,7 @@ struct recordStruct
     int AST_home;
     int REB_home;
     bool HOME_TEAM_WINS; // or int
-}
+};
 
-#
+
+#endif
