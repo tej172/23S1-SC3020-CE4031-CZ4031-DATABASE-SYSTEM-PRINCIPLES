@@ -11,7 +11,7 @@ class Disk{
     int availableBlocks;  //keeps track of num of Available block, will decrement by one everytime block is allocated
     
     int currBlockMemUsed; //keeps track of how many memory is already is used in the curr block being pointed 
-
+    int currBlockNumber;
     void *startDisk; // pointer pointing to the start of disk 
     void *block; //pointer pointing to the end of disk 
 
@@ -21,7 +21,7 @@ class Disk{
             this->diskSize = diskSize; 
             this->blockSize = blockSize;
             this->availableBlocks = diskSize / blockSize;
-            
+            this->currBlockNumber = 0;
             this->startDisk = operator new(diskSize); //allocate diskSize amount of memory in the heap, and make it point ot the start of this memory
             this->block = startDisk; //initially start at the startDisk 
 
@@ -33,6 +33,7 @@ class Disk{
             if (availableBlocks > 0){
                 availableBlocks -= 1; //decrement the num of available blocks by 1
                 //typecasted to char * so it moves 1 byte away from blockSize, if typecasted to another type -> e.g. int, then +1 will move it 4 bytes away 
+                currBlockNumber += 1;
                 block = (char *)block + blockSize;
                 currBlockMemUsed = 0;
                 std::cout << "[SUCCESS] Successfully allocate a new block into memory. Memory Used: " << memoryUsed() << " / " << diskSize << '\n'; 
@@ -60,7 +61,7 @@ class Disk{
             int offset = currBlockMemUsed;
             currBlockMemUsed = currBlockMemUsed + recordSize;    
 
-            Address record = {currBlockNumber(), offset};
+            Address record = {currBlockNumber, offset};
             return record;
         };        
 
@@ -100,10 +101,6 @@ class Disk{
             return sizeUsed;
         };
 
-        int currBlockNumber(){
-            int blockNum = floor(memoryUsed() / blockSize);
-            return blockNum;
-        };
 
 
 };
