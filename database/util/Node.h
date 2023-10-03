@@ -10,11 +10,11 @@ class Node
 
 public: 
     //REMEMBER change the public member to private after testing 
-    int currKeyNum; // current number of keys in the node
-    bool isLeaf; // boolean is Node a leaf
-    Address *addressPtrs; // A pointer to an array of address -> only for leaf 
-    Node **nodePtrs;  //A pointer to an array of Nodes -> for any internal node 
-    float *keys; // A pointer to an array of keys
+    int currKeyNum; // size
+    bool isLeaf; // IS_LEAF
+    Address *addressPtrs; //?????
+    Node **nodePtrs;  //ptr
+    float *keys; // key
 
     Node(int maxKey);
 };

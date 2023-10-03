@@ -25,9 +25,11 @@
     
 
 #include "Node.h"
+#include "Address.h"
 
 Node::Node(int maxKey) {
     keys = new float[maxKey];
     nodePtrs = new Node*[maxKey+1];
+    addressPtrs = new Address[maxKey];
     currKeyNum = 0;
 };

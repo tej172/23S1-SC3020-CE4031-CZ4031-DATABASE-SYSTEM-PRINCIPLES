@@ -129,8 +129,6 @@ int main(void) {
 
 	//Testing inserting B+ Tree
 	BPlusTree *BPTree = new BPlusTree(3);
-	Address * address = new Address();
-
 	
 	// BPTree->insert(*address, 2);
 	// BPTree->insert(*address, 3);
@@ -157,20 +155,52 @@ int main(void) {
 	// }
 
 	// test for teg delete
-	 BPTree->insert(*address, 1);
-	 BPTree->insert(*address, 4);
-	 BPTree->insert(*address, 5);
-	 BPTree->insert(*address, 7);
+	Address *address1 = new Address(1, 1);
+	Address *address2 = new Address(4, 4);
+	Address *address3 = new Address(7, 7);
+	Address *address4 = new Address(10, 10);
+	Address *address5 = new Address(17, 17);
+	Address *address6 = new Address(19, 19);
+	Address *address7 = new Address(20, 20);
+	Address *address8 = new Address(21, 21);
+	Address *address9 = new Address(25, 25);
+	Address *address10 = new Address(31, 31);
 
-	BPTree->insert(*address, 10);
-	BPTree->insert(*address, 17);
-	BPTree->insert(*address, 19);
-	BPTree->insert(*address, 20);
-	BPTree->insert(*address, 21);
-	BPTree->insert(*address, 25);
-	BPTree->insert(*address, 31);
+	
+	BPTree->insert(*address1, 1);
+	BPTree->insert(*address2, 4);
+	BPTree->insert(*address3, 7);
+	BPTree->insert(*address4, 10);
+	BPTree->insert(*address5, 17);
+	BPTree->insert(*address6, 19);
+	BPTree->insert(*address7, 20);
+	BPTree->insert(*address8, 21);
+	BPTree->insert(*address9, 25);
+	BPTree->insert(*address10, 31);
 
 	BPTree->printTree(BPTree->root);
+
+	Address * findAddress1 = BPTree->findSearchKey(1);
+	 std::cout << "blkNumber: " << findAddress1->blkNumber << ", offset: " << findAddress1->offset << std::endl;
+	findAddress1 = BPTree->findSearchKey(4);
+	 std::cout << "blkNumber: " << findAddress1->blkNumber << ", offset: " << findAddress1->offset << std::endl;
+	findAddress1 = BPTree->findSearchKey(7);
+	 std::cout << "blkNumber: " << findAddress1->blkNumber << ", offset: " << findAddress1->offset << std::endl;
+	findAddress1 = BPTree->findSearchKey(10);
+	 std::cout << "blkNumber: " << findAddress1->blkNumber << ", offset: " << findAddress1->offset << std::endl;
+	findAddress1 = BPTree->findSearchKey(17);
+	 std::cout << "blkNumber: " << findAddress1->blkNumber << ", offset: " << findAddress1->offset << std::endl;
+	findAddress1 = BPTree->findSearchKey(19);
+	 std::cout << "blkNumber: " << findAddress1->blkNumber << ", offset: " << findAddress1->offset << std::endl;
+	findAddress1 = BPTree->findSearchKey(20);
+	 std::cout << "blkNumber: " << findAddress1->blkNumber << ", offset: " << findAddress1->offset << std::endl;
+	findAddress1 = BPTree->findSearchKey(21);
+	 std::cout << "blkNumber: " << findAddress1->blkNumber << ", offset: " << findAddress1->offset << std::endl;
+	findAddress1 = BPTree->findSearchKey(25);
+	 std::cout << "blkNumber: " << findAddress1->blkNumber << ", offset: " << findAddress1->offset << std::endl;
+	findAddress1 = BPTree->findSearchKey(31);
+	 std::cout << "blkNumber: " << findAddress1->blkNumber << ", offset: " << findAddress1->offset << std::endl;
+
 	// BPTree->insert(*address, 25);
 	// BPTree->insert(*address, 25);
 	// BPTree->insert(*address, 31);
@@ -182,16 +212,16 @@ int main(void) {
 	// BPTree->deleteNode(4);
 	// BPTree->deleteNode(5);
 	// BPTree->deleteNode(7);
-	BPTree->deleteNode(10);
+	//BPTree->deleteNode(10);
 	// BPTree->deleteNode(17);
 	//BPTree->deleteNode(19);
 	//BPTree->deleteNode(20);
-	BPTree->deleteNode(21);
-	BPTree->deleteNode(25);
-	BPTree->deleteNode(31);
+	//BPTree->deleteNode(21);
+	//BPTree->deleteNode(25);
+	//BPTree->deleteNode(31);
 	// BPTree->deleteNode(25);
 
-	BPTree->printTree(BPTree->root);
+	//BPTree->printTree(BPTree->root);
 
 	//std::cout<<"now";
 

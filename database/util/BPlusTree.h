@@ -157,11 +157,14 @@ public:
   void insert(Address address, float key){
     if(root==NULL){
             root = new Node(MAX_KEY);
+            root->addressPtrs[0] = address; 
             root->keys[0] = key;
             root->isLeaf = true;
             root->currKeyNum = 1;
     }else{
-
+    //cursor == insertPtr
+    //parent == parent
+    //size = currKeyNum
     Node * insertPtr = root;
     Node * parent;
 
@@ -193,13 +196,13 @@ public:
 
         for (int j = insertPtr->currKeyNum; j > i; j--){
             insertPtr->keys[j] = insertPtr->keys[j-1];
-            //insertPtr->addressPtrs[j] = insertPtr->addressPtrs[j-1];
+            insertPtr->addressPtrs[j] = insertPtr->addressPtrs[j-1];
         }
         insertPtr->keys[i] = key;
-        // insertPtr->addressPtrs[i] = address; TODO: do the addressing part 
+        insertPtr->addressPtrs[i] = address; 
         insertPtr->currKeyNum += 1;
         
-        //??????
+        // ensure that the leaf nodes remain linked together in the correct order after inserting a new key into the B+ tree
         insertPtr->nodePtrs[insertPtr->currKeyNum] = insertPtr->nodePtrs[insertPtr->currKeyNum - 1];
         insertPtr->nodePtrs[insertPtr->currKeyNum - 1] = NULL;
 
@@ -209,17 +212,23 @@ public:
         Node * newNode = new Node(MAX_KEY);
         Node * tempNode = new Node(MAX_KEY+1);
 
-        for (int i = 0; i < MAX_KEY; i++)
+        for (int i = 0; i < MAX_KEY; i++){
             // all elements of this block stored
             tempNode->keys[i] = insertPtr->keys[i];
+            tempNode->addressPtrs[i] = insertPtr->addressPtrs[i];
+        }
+            
 
         int i = 0;
         while (key > tempNode->keys[i] && i < MAX_KEY) i++;
 
-        for (int j = MAX_KEY + 1; j > i; j--)
+        for (int j = MAX_KEY + 1; j > i; j--){
             tempNode->keys[j] = tempNode->keys[j - 1];
+            tempNode->addressPtrs[j] = tempNode->addressPtrs[j];
+        }
         // inserted element in its rightful position;
         tempNode->keys[i] = key;
+        tempNode->addressPtrs[i] = address;
 
         newNode->isLeaf = true;
         insertPtr->currKeyNum = (MAX_KEY + 1) / 2;
@@ -233,11 +242,16 @@ public:
         insertPtr->nodePtrs[newNode->currKeyNum] = insertPtr->nodePtrs[MAX_KEY];
         insertPtr->nodePtrs[MAX_KEY] = NULL;
  
-        for (int i = 0; i < insertPtr->currKeyNum; i++)
+        for (int i = 0; i < insertPtr->currKeyNum; i++){
             insertPtr->keys[i] = tempNode->keys[i];
+            insertPtr->addressPtrs[i] = tempNode->addressPtrs[i];
+        }
+            
 
-        for (int i = 0, j = insertPtr->currKeyNum; i < newNode->currKeyNum; i++, j++)
+        for (int i = 0, j = insertPtr->currKeyNum; i < newNode->currKeyNum; i++, j++){
             newNode->keys[i] = tempNode->keys[j];
+            newNode->addressPtrs[i] = tempNode->addressPtrs[j];
+        }
 
         //modify the parent
         if(insertPtr == root){
@@ -312,18 +326,19 @@ public:
         //std::cout << "[KEY NOT FOUND] \n";
         return nullptr;
   };
-  int findSearchKey(float searchKey){ //change the return to address once its set up
+  Address * findSearchKey(float searchKey){ //change the return to address once its set up
     Node * node = findCorrectNodeForKey(searchKey, this->root);
     if (node != nullptr){
     for (int i=0; i< node->currKeyNum; i++){
         if (node->keys[i] == searchKey){
                 std::cout << "[KEY FOUND] \n";
-                return node->keys[i];
+                Address* addressPointer = &node->addressPtrs[i];
+                return addressPointer;
             }
     }}
     
     std::cout << "[KEY NOT FOUND] \n";
-    return -1;
+    return nullptr;
   }
 
   void printTree(Node *displayNode){
