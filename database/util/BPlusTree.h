@@ -354,17 +354,19 @@ public:
     if(root == NULL){
         std::cout << "[ERROR] Tree is empty. \n";
         return;
-    }else{
+    }
+    else{
         Node *currNode = root;
         Node *parent;
 
         int leftSibling, rightSibling;
-        while(currNode->isLeaf==false)
+
+        while(currNode->isLeaf!=true)
         {
-            parent = currNode; //modi_1
+            //parent = currNode; //modi_1
             for(int i = 0; i < currNode->currKeyNum; i++)
             {
-                // modi_1
+                parent = currNode; // modi_1
                 leftSibling = i-1;
                 rightSibling = i+1;
                 if(key < currNode->keys[i])
@@ -374,11 +376,16 @@ public:
                 }
                 if(i == (currNode->currKeyNum - 1))
                 {
+                    //added in_Start
+                    leftSibling = i;
+                    rightSibling=i+2;
+                    // added in_End
                     currNode = currNode->nodePtrs[i+1];
                     break;
                 }
             }
         }
+        
         bool flagFound = false;
         int leafPosition;
         for (leafPosition = 0; leafPosition < currNode->currKeyNum; leafPosition++)
