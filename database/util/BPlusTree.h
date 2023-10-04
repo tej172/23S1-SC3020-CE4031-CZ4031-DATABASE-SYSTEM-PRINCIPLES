@@ -613,14 +613,13 @@ public:
                 delete[] child->keys;
                 delete[] child->nodePtrs;
                 delete child;
-                
+
                 root = currNode->nodePtrs[1];
                 delete[] currNode->keys;
                 delete[] currNode->nodePtrs;
 
                 std::cout << "===============================\nRoot Node Has Been Changed\n===============================\n";
                 delete currNode;
-                
                 
                 return;
             }
@@ -635,7 +634,7 @@ public:
     for (int i = position; i < currNode->currKeyNum; i++){
         currNode->keys[i] = currNode->keys[i + 1];
     }
-    for (position = 0; position < currNode->currKeyNum + 1; position++){
+    for (position = 0; position < currNode->currKeyNum+1; position++){
         if (currNode->nodePtrs[position] == child){
             break;
         }
@@ -647,9 +646,13 @@ public:
     //decrement current node num of keys 
     currNode->currKeyNum--;
 
-    if (currNode->currKeyNum >= (MAX_KEY + 1) / 2 - 1){
+    if (currNode->currKeyNum >= (MAX_KEY+1)/2 -1){
+        std::cout<<"NO UNDERFLOW. KEY: "<< key <<" DELETED FROM INTERNAL NODE";
         return;
     }
+
+
+    //underflow PRESENT neeed to fix 
 
     if (currNode == root){
         return;
@@ -677,12 +680,12 @@ public:
     if (leftSibling >= 0){
         Node *leftNode = parent->nodePtrs[leftSibling];
 
-        if (leftNode->currKeyNum >= (MAX_KEY + 1) / 2){
+        if (leftNode->currKeyNum >= (MAX_KEY+1)/2){
             for (int i = currNode->currKeyNum; i > 0; i--){
                 currNode->keys[i] = currNode->keys[i - 1];
             }
             currNode->keys[0] = parent->keys[leftSibling];
-            parent->keys[leftSibling] = leftNode->keys[leftNode->currKeyNum - 1];
+            parent->keys[leftSibling] = leftNode->keys[leftNode->currKeyNum-1];
             for (int i = currNode->currKeyNum + 1; i > 0; i--){
                 currNode->nodePtrs[i] = currNode->nodePtrs[i - 1];
             }
@@ -697,7 +700,8 @@ public:
     if (rightSibling <= parent->currKeyNum)
     {
         Node *rightNode = parent->nodePtrs[rightSibling];
-        if (rightNode->currKeyNum >= (MAX_KEY + 1) / 2){
+
+        if (rightNode->currKeyNum >= (MAX_KEY+1)/2){
 
             currNode->keys[currNode->currKeyNum] = parent->keys[position];
             parent->keys[position] = rightNode->keys[0];
@@ -723,13 +727,15 @@ public:
         for (int i = leftNode->currKeyNum + 1, j = 0; j < currNode->currKeyNum; j++){
             leftNode->keys[i] = currNode->keys[j];
         }
-        for (int i = leftNode->currKeyNum + 1, j = 0; j < currNode->currKeyNum + 1; j++){
+        for (int i = leftNode->currKeyNum + 1, j = 0; j < currNode->currKeyNum+1; j++){
             leftNode->nodePtrs[i] = currNode->nodePtrs[j];
             currNode->nodePtrs[j] = NULL;
         }
 
         leftNode->currKeyNum += currNode->currKeyNum + 1;
         currNode->currKeyNum = 0;
+        
+        
         deleteInternal(parent->keys[leftSibling], parent, currNode);
     }
     else if (rightSibling <= parent->currKeyNum)
@@ -738,6 +744,7 @@ public:
         //cout << "right node: "; 
         //printKeys(rightNode);cout<<endl;
         currNode->keys[currNode->currKeyNum] = parent->keys[rightSibling - 1];
+        
         for (int i = currNode->currKeyNum + 1, j = 0; j < rightNode->currKeyNum; j++){
             currNode->keys[i] = rightNode->keys[j];
         }
