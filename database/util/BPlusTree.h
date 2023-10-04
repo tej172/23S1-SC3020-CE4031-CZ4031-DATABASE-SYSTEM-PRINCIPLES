@@ -343,7 +343,7 @@ public:
 
   void printTree(Node *displayNode){
     std::cout << "===============================\n";
-    std::cout << "B+ Tree Print Out\n";
+    std::cout << "\tB+ Tree Print Out\n";
     std::cout << "===============================\n";
 
     displayBT(displayNode);
@@ -376,7 +376,7 @@ public:
 
         int leftSibling, rightSibling;
 
-        while(currNode->isLeaf!=true)
+        while(currNode->isLeaf != true)
         {
             //parent = currNode; //modi_1
             for(int i = 0; i < currNode->currKeyNum; i++)
@@ -400,104 +400,147 @@ public:
                 }
             }
         }
-        
+
         bool flagFound = false;
         int leafPosition;
-        for (leafPosition = 0; leafPosition < currNode->currKeyNum; leafPosition++)
-        {
-            if (currNode->keys[leafPosition] == key)
-            {
+        for (leafPosition = 0; leafPosition < currNode->currKeyNum; leafPosition++){
+            if (currNode->keys[leafPosition] == key){
                 flagFound = true;
                 break;
             }
         }
         if(flagFound==false){
-            std::cout << "==================================\n";
+            std::cout << "==========================================\n";
             std::cout << "[KEY NOT FOUND]: Nothing to delete in tree";
-            std::cout << "\n==================================\n";
+            std::cout << "\n==========================================\n";
             return;
-        }else{
-            // std::cout<< "=========\nfound key";
-            // std::cout<< "\nkey: " << key << "\nleaf position: "<< leafPosition <<"\n=========\n";
-            std::cout << "=========\nbefore delete\n=========\n";
+        }
+            std::cout<< "=========\nfound key";
+            std::cout<< "\nkey: " << key << "\nleaf position: "<< leafPosition <<"\n=========\n";
+            std::cout << "\n\n=========\nbefore delete\n=========\n";
 
-            for(int i=leafPosition; i<currNode->currKeyNum;i++){
+            for(int i=leafPosition; i<currNode->currKeyNum; i++){
                 currNode->keys[i] = currNode->keys[i+1];
                 //currNode->addressPtrs[i] = currNode->addressPtrs[i+1];
             }
             currNode->currKeyNum -= 1;
-            std::cout << "=========\nafter delete\n=========\n";
+
+            
             if(currNode==root){
+                std::cout << "\nDeleted key: "<< key << " from node <rootnode>!!\n";
+                std::cout << "=========\nafter delete\n=========\n";
                 //if no keys left (i.e. all keys deleted)
                 //cout<<"Deleted"
-                for(int i=0; i<currNode->currKeyNum; i++){
+                for(int i=0; i<(MAX_KEY+1); i++){
                     currNode->nodePtrs[i] =NULL;
-                    //cout<<"Address of node["<<i<<"] is :"<<currNode->addressPtrs[i]->pageNo <<" ";
+                    //std::cout<<"Address of node[" << i << "] is :"<< currNode->addressPtrs[i]->pageNo <<" ";
                 }
                 if(currNode->currKeyNum==0)
                 {
-                    //modi2 (switch)
-                    delete[] currNode->nodePtrs;
+                    // modi2 (switch) //na
+                    // added in_Start
                     delete[] currNode->keys;
+                    delete[] currNode->nodePtrs;
+                    // added in_end
                     delete currNode;
                     std::cout << "=========\ntree DELETED\n=========\n";
+                    root = NULL;
                 }
                 return; //tree deleted                        
             }
+
+            
             currNode->nodePtrs[currNode->currKeyNum] = currNode->nodePtrs[currNode->currKeyNum+1];
             currNode->nodePtrs[currNode->currKeyNum+1] = NULL;
+            std::cout << "\nDeleted key: " << key << " from node <leafnode>!!\n";
+            std::cout << "=========\nafter delete\n=========\n";
+
             if(currNode->currKeyNum >= (MAX_KEY+1)/2){
-                std::cout << "=========\nno underflow\n=========\n";
+                std::cout << "=========\nNO Underflow\n=========\n";
                 return;
             }
 
+
+            //there is underflow: not enough keys in the node (need to borrow or merge now)
+            std::cout << "=========\nUnderflow Present\n=========\n";
+            // check if left sibling has keys (i.e. if it exists)
             if(leftSibling >=0){
                 Node *leftNode = parent->nodePtrs[leftSibling];
-                if(leftNode->currKeyNum>=((MAX_KEY+1)/2+1)){
+
+                //checking iF can borrow
+                if(leftNode->currKeyNum >= (MAX_KEY+1)/2+1){
+                    
+                    std::cout << "==================\nBorrowing from left sibling\n==================\n";
+                    //move the current keys in the node to the right by 1 position so can have an extra space to borrow the rightmost left sibling key
                     for(int i = currNode->currKeyNum; i>0; i--){
                         currNode->keys[i] = currNode->keys[i-1];
                         //currNode->addressPtrs[i] = currNode->addressPtrs[i-1];
                     }
+
+                    //move the pointer to the next right leaf node
                     currNode->currKeyNum++;
                     currNode->nodePtrs[currNode->currKeyNum] = currNode->nodePtrs[currNode->currKeyNum-1];
                     currNode->nodePtrs[currNode->currKeyNum -1] =NULL;
+                    
+                    //move the key over from right most key in left sibling to the current node
                     currNode->keys[0] = leftNode->keys[leftNode->currKeyNum -1];
                     //currNode->addressPtrs[0] = leftNode->addressPtrs[leftNode->currKeyNum -1];
+                    
+                    //update the left sibling pointer
                     leftNode->currKeyNum--;
                     leftNode->nodePtrs[leftNode->currKeyNum]=currNode;
                     leftNode->nodePtrs[leftNode->currKeyNum + 1]=NULL;
+                    std::cout<<"============\nAfter Borrowing from Left neighbour node\n============\n";
+                    //update the parent key value to right subtree, leftmost key value
                     parent->keys[leftSibling] = currNode->keys[0];
                     return;
                 }
             }
+
+            //check if right sibling has keys
             if (rightSibling <= parent->currKeyNum){
                 Node *rightNode = parent->nodePtrs[rightSibling];
-                if(rightNode->currKeyNum >= (((MAX_KEY+1)/2)+1)){
-                    currNode->currKeyNum++;
 
+                //check if can borrow
+                if(rightNode->currKeyNum >= (MAX_KEY+1)/2+1){
+                    std::cout << "==================\nBorrowing from right sibling\n==================\n";
+                    
+                    currNode->currKeyNum++;
                     currNode->nodePtrs[currNode->currKeyNum] = currNode->nodePtrs[currNode->currKeyNum -1];
                     currNode->nodePtrs[currNode->currKeyNum -1] = NULL;
+                    
+                    //MOVE THE RIGHT SIB 1st key to the current node end
                     currNode->keys[currNode->currKeyNum - 1] = rightNode->keys[0];
                     //currNode->addressPtrs[currNode->currKeyNum -1] = rightNode->addressPtrs[0];
+                    
+                    //adjust the right sib node ptrs after moving the key
                     rightNode->currKeyNum--;
-
                     rightNode->nodePtrs[rightNode->currKeyNum] =rightNode->nodePtrs[rightNode->currKeyNum +1];
                     rightNode->nodePtrs[rightNode->currKeyNum +1] = NULL;
                     // currNode->nodePtrs[currNode->currKeyNum] = rightNode->nodePtrs[0];
                     // rightNode->nodePtrs[0] = rightNode->nodePtrs[1];
                     // rightNode->nodePtrs[rightNode->currKeyNum] = NULL;
 
+                    //move the keys now
                     for(int i=0; i<rightNode->currKeyNum; i++){
                         rightNode->keys[i] = rightNode->keys[i+1];
                         //rightNode->addressPtrs[i] = rightNode->addressPtrs[i+1];
                     }
                     // rightNode->currKeyNum--;
+
+                    std::cout << "============\nAfter Borrowing from Right neighbour node\n============\n";
                     parent->keys[rightSibling-1] = rightNode->keys[0];
                     return;
                 }
             }
+
+            //case if there is a need to merge the nodes
             if(leftSibling>=0){
                 Node *leftNode =parent->nodePtrs[leftSibling];
+
+                //move all the keys to the left sibling
+                std::cout << "==================\nMerge with left sibling node\n==================\n";
+
                 for(int i=leftNode->currKeyNum, j=0; j<currNode->currKeyNum; i++, j++){
                     leftNode->keys[i] = currNode->keys[j];
                     //leftNode->addressPtrs[i] = currNode->addressPtrs[j];
@@ -505,13 +548,22 @@ public:
                 leftNode->nodePtrs[leftNode->currKeyNum] = NULL;
                 leftNode->currKeyNum += currNode->currKeyNum;
                 leftNode->nodePtrs[leftNode->currKeyNum] = currNode->nodePtrs[currNode->currKeyNum];
+                std::cout << "==================\nAfter Merging with left sibling\n==================\n";
+
                 //delete currNode;
+                std::cout << "+++++++++++++++++++++++\nUpdating Internal Nodes\n+++++++++++++++++++++++\n";
                 deleteInternal(parent->keys[leftSibling], parent, currNode);
                 delete[] currNode->keys;
                 delete[] currNode->nodePtrs;
                 delete currNode;
-            }else if(rightSibling <= parent->currKeyNum){
+
+                std::cout << "+++++++++++++++++++++++++++++\nDeleted CurrNode After Merge\n+++++++++++++++++++++++++++++\n";
+            }
+            else if(rightSibling <= parent->currKeyNum){
                 Node *rightNode =  parent->nodePtrs[rightSibling];
+
+                std::cout << "==================\nMerge with right sibling node\n==================\n";
+
                 for(int i =currNode->currKeyNum, j=0; j<rightNode->currKeyNum; i++,j++){
                     currNode->keys[i] = rightNode->keys[j];
                     //currNode->addressPtrs[i] = rightNode->addressPtrs[j];
@@ -520,16 +572,21 @@ public:
                 currNode->currKeyNum += rightNode->currKeyNum;
                 currNode->nodePtrs[currNode->currKeyNum]=rightNode->nodePtrs[rightNode->currKeyNum];
                 //delete rightNode;
-                std::cout << "==============\nMerging Leaf Node\n==============\n";
+                std::cout << "==================\nAfter Merging with Right sibling\n==================\n";
+
+                std::cout << "+++++++++++++++++++++++\nUpdating Internal Nodes\n+++++++++++++++++++++++\n";
                 deleteInternal(parent->keys[rightSibling-1], parent, rightNode);
                 delete[] rightNode->keys;
                 delete[] rightNode->nodePtrs;
                 delete rightNode;
+                std::cout << "+++++++++++++++++++++++++++++\nDeleted Right Sibling Node After Merge\n+++++++++++++++++++++++++++++\n";
             }
-        }
+        
     }
   }
   void deleteInternal(float key, Node *currNode, Node *child){ //touch-upcode
+    //
+    //    
     if (currNode == root)
     {
         if (currNode->currKeyNum == 1)
@@ -544,9 +601,10 @@ public:
                 root = currNode->nodePtrs[0];
                 delete[] currNode->keys;
                 delete[] currNode->nodePtrs;
+                delete currNode;
 
                 std::cout << "===============================\nRoot Node Has Been Changed\n===============================\n";
-                delete currNode;
+                
                 
                 return;
             }
@@ -555,6 +613,7 @@ public:
                 delete[] child->keys;
                 delete[] child->nodePtrs;
                 delete child;
+                
                 root = currNode->nodePtrs[1];
                 delete[] currNode->keys;
                 delete[] currNode->nodePtrs;
