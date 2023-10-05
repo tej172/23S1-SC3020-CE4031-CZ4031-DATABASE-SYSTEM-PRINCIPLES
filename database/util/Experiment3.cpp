@@ -52,7 +52,7 @@ int main() {
     int numBlocks = 0;
     int recordSize=0;
 
-    // Initialize the Disk object with your desired block and disk size
+    // Initialize the Disk object 
     Disk disk(400, 300000000);
 
     ifstream inputFile("../src/games.txt");

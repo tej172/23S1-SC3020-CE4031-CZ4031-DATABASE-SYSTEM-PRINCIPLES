@@ -789,7 +789,11 @@ public:
   }
 
   int getN() const {
-        return MAX_KEY;
+    int sizeofkey = 4;
+    int blocksize = 400; 
+    int sizeofptr = 8; 
+    int n = (blocksize-sizeofptr)/(sizeofkey+sizeofptr);
+    return n;
     }
 int getNumNodes(Node* node) {
     if (node == nullptr) {

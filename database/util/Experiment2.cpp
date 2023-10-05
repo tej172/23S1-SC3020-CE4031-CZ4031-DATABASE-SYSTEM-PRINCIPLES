@@ -49,7 +49,7 @@ int main() {
     size_t totalRecordSize = 0;
     int recordsPerBlock = 0;
     int numBlocks = 0;
-
+    
     // Initialize the Disk object with your desired block and disk size
     Disk disk(400, 300000000);
 
@@ -60,7 +60,7 @@ int main() {
     }
 
     // Create a B+ tree for Experiment 2
-    BPlusTree bPlusTree(5);
+    BPlusTree bPlusTree(32);
 
     // Read and process each line from the input file
     string line;
