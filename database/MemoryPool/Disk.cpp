@@ -87,3 +87,28 @@ int Disk::memoryUsed() {
 int Disk::getAvailableBlocks() const {
     return availableBlocks;
 }
+
+
+void* Disk::loadDataBlockFromDisk(int blockNumber) const{
+    if (blockNumber < 0 || blockNumber >= totalBlocks) {
+        std::cerr << "Error: Invalid block number." << std::endl;
+        return nullptr;
+    }
+
+    return (char*)startDisk + blockNumber * blockSize;
+}
+
+int Disk::getNumRecordsInBlock(const void* blockData, std::size_t recordSize) const{
+    // Calculate the number of records based on block size and record size
+    return blockSize / recordSize;
+}
+
+void* Disk::loadRecordFromBlock(const void* blockData, int recordIndex, std::size_t recordSize) const{
+    if (recordIndex < 0 || recordIndex >= getNumRecordsInBlock(blockData, recordSize)) {
+        std::cerr << "Error: Invalid record index." << std::endl;
+        return nullptr;
+    }
+
+    return (char*)blockData + recordIndex * recordSize;
+}
+

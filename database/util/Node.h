@@ -17,6 +17,14 @@ public:
     float *keys; // key
 
     Node(int maxKey);
+
+        int getNumKeys() const {
+        return currKeyNum;
+    }
+
+    bool isLeafNode() const {
+        return isLeaf;
+    }
 };
 
 #endif // NODE_H

@@ -13,6 +13,7 @@ private:
     int currBlockNumber;
     void* startDisk;
     void* block;
+    int totalBlocks;
 
 public:
     Disk(int blockSize, int diskSize);
@@ -24,6 +25,9 @@ public:
     bool UpdateDisk(void* itemAddress, std::size_t recordSize, Address address);
     int memoryUsed();
     int getAvailableBlocks() const;
+    void* loadDataBlockFromDisk(int blockNumber) const;
+    int getNumRecordsInBlock(const void* blockData, std::size_t recordSize) const;
+    void* loadRecordFromBlock(const void* blockData, int recordIndex, std::size_t recordSize) const;
     int getBlockSize() const {
         return blockSize;
     }
@@ -31,6 +35,12 @@ public:
     int getCurrBlockMemUsed() const {
         return currBlockMemUsed;
     }
+
+     int getNumBlocks() const {
+        return totalBlocks;
+    }
+      // Destructor
+//   ~Disk();
 };
 
 #endif // DISK_H   

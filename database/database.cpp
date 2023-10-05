@@ -6,7 +6,7 @@
 // Description : Hello World in C, Ansi-style
 //============================================================================
 
-#include "MemoryPool/MemoryPool.cpp"
+#include "MemoryPool/Disk.cpp"
 #include "util/BPlusTree.h"
 #include "util/Node.h"
 #include "util/Address.h"

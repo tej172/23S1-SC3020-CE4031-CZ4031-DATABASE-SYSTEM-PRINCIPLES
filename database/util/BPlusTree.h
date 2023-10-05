@@ -10,14 +10,36 @@
 #include <cmath>
 #include <sstream>
 #include <queue>
-
+#include <algorithm>
 class BPlusTree
 {
 // private:
 //   Node *root;       
 //   int MAX_KEY;   
 //   void insertInternal(float key, Node *cursorDiskAddress, Node *childDiskAddress);
+private:
+    int countNodesRecursively(Node* node) const {
+        if (!node)
+            return 0;
 
+        int count = 1;  // Count the current node
+        for (int i = 0; i <= node->currKeyNum; i++) {
+            count += countNodesRecursively(node->nodePtrs[i]);  // Recursively count child nodes
+        }
+        return count;
+    }
+
+    int findDepthRecursively(Node* node) const {
+        if (!node)
+            return 0;
+
+        int maxDepth = 0;
+        for (int i = 0; i <= node->currKeyNum; i++) {
+            int childDepth = findDepthRecursively(node->nodePtrs[i]);  // Recursively find child depths
+            maxDepth = std::max(maxDepth, childDepth);
+        }
+        return maxDepth + 1;
+    }
 public:
   Node *root;       
   int MAX_KEY;   
@@ -272,6 +294,7 @@ public:
     }
     }
   }
+ 
   Node * findCorrectNodeForKey(float searchKey, Node * rootPtr = nullptr){
         //std::cout << "[STARTING SEARCH] searchKey: " << searchKey << " \n";
         //std::cout << "[ENTERING FUNC] \n";
@@ -389,6 +412,7 @@ public:
                     currNode = currNode->nodePtrs[i];
                     break;
                 }
+                //udah reach the last key, and mau ke pointer terakhir
                 if(i == (currNode->currKeyNum - 1))
                 {
                     //added in_Start
@@ -403,6 +427,7 @@ public:
 
         bool flagFound = false;
         int leafPosition;
+        //finding the key
         for (leafPosition = 0; leafPosition < currNode->currKeyNum; leafPosition++){
             if (currNode->keys[leafPosition] == key){
                 flagFound = true;
@@ -419,6 +444,7 @@ public:
             std::cout<< "\nkey: " << key << "\nleaf position: "<< leafPosition <<"\n=========\n";
             std::cout << "\n\n=========\nbefore delete\n=========\n";
 
+            //shifting the variable, overwriting the deleted variable
             for(int i=leafPosition; i<currNode->currKeyNum; i++){
                 currNode->keys[i] = currNode->keys[i+1];
                 //currNode->addressPtrs[i] = currNode->addressPtrs[i+1];
@@ -449,8 +475,9 @@ public:
                 return; //tree deleted                        
             }
 
-            
+            //pointer to next node is shifted one backward
             currNode->nodePtrs[currNode->currKeyNum] = currNode->nodePtrs[currNode->currKeyNum+1];
+            //pointer to next node is set as NULL 
             currNode->nodePtrs[currNode->currKeyNum+1] = NULL;
             std::cout << "\nDeleted key: " << key << " from node <leafnode>!!\n";
             std::cout << "=========\nafter delete\n=========\n";
@@ -459,7 +486,6 @@ public:
                 std::cout << "=========\nNO Underflow\n=========\n";
                 return;
             }
-
 
             //there is underflow: not enough keys in the node (need to borrow or merge now)
             std::cout << "=========\nUnderflow Present\n=========\n";
@@ -563,13 +589,16 @@ public:
                 Node *rightNode =  parent->nodePtrs[rightSibling];
 
                 std::cout << "==================\nMerge with right sibling node\n==================\n";
-
+                //write into the left node all the available right node 
                 for(int i =currNode->currKeyNum, j=0; j<rightNode->currKeyNum; i++,j++){
                     currNode->keys[i] = rightNode->keys[j];
-                    //currNode->addressPtrs[i] = rightNode->addressPtrs[j];
+                    currNode->addressPtrs[i] = rightNode->addressPtrs[j];
                 }
+                //set as NULL to make space to be overwritten by the added node address, by right can remove 
+                //aye bro i think error?? this should be deleted ERROR CHECK 
                 currNode->nodePtrs[currNode->currKeyNum] =NULL;
                 currNode->currKeyNum += rightNode->currKeyNum;
+                //link back to the node that is linked to rightNode
                 currNode->nodePtrs[currNode->currKeyNum]=rightNode->nodePtrs[rightNode->currKeyNum];
                 //delete rightNode;
                 std::cout << "==================\nAfter Merging with Right sibling\n==================\n";
@@ -626,27 +655,27 @@ public:
         }
     }
     int position;
-    for (position = 0; position < currNode->currKeyNum; position++){
+    for (position = 0; position < currNode->currKeyNum; position++){ //the index responsible for the right key
         if (currNode->keys[position] == key){
             break;
         }
     }
     for (int i = position; i < currNode->currKeyNum; i++){
-        currNode->keys[i] = currNode->keys[i + 1];
+        currNode->keys[i] = currNode->keys[i + 1]; //delete the index responsible for the rightkey and shift everything backward
     }
-    for (position = 0; position < currNode->currKeyNum+1; position++){
-        if (currNode->nodePtrs[position] == child){
+    for (position = 0; position < currNode->currKeyNum+1; position++){ //find pointer that point to the child
+        if (currNode->nodePtrs[position] == child){ // why not just set the currpointer as child?? oh want the index nvm
             break;
         }
     }
-    for (int i = position; i < currNode->currKeyNum + 1; i++){
+    for (int i = position; i < currNode->currKeyNum + 1; i++){ //delete the node responsible for the deleted child
         currNode->nodePtrs[i] = currNode->nodePtrs[i + 1];
     }
 
     //decrement current node num of keys 
     currNode->currKeyNum--;
-
-    if (currNode->currKeyNum >= (MAX_KEY+1)/2 -1){
+    
+    if (currNode->currKeyNum >= (MAX_KEY+1)/2 -1){ //if new parent node has enough number of key
         std::cout<<"NO UNDERFLOW. KEY: "<< key <<" DELETED FROM INTERNAL NODE";
         return;
     }
@@ -670,26 +699,26 @@ public:
     // }
     //if (!isLeftChild(parent)){
 
-    for (position = 0; position < parent->currKeyNum + 1; position++){
+    for (position = 0; position < parent->currKeyNum + 1; position++){//find index of the currNode
         if (parent->nodePtrs[position] == currNode){
             leftSibling = position - 1;
             rightSibling = position + 1;
             break;
         }
     }
-    if (leftSibling >= 0){
+    if (leftSibling >= 0){ //there is a left sibling
         Node *leftNode = parent->nodePtrs[leftSibling];
 
-        if (leftNode->currKeyNum >= (MAX_KEY+1)/2){
-            for (int i = currNode->currKeyNum; i > 0; i--){
+        if (leftNode->currKeyNum >= (MAX_KEY+1)/2){ //Left sibling can spare a key
+            for (int i = currNode->currKeyNum; i > 0; i--){ //make space to insert new key
                 currNode->keys[i] = currNode->keys[i - 1];
             }
-            currNode->keys[0] = parent->keys[leftSibling];
+            currNode->keys[0] = currNode->nodePtrs[0]->keys[0];//put the left sibling key CHECK ERROR: edited code
             parent->keys[leftSibling] = leftNode->keys[leftNode->currKeyNum-1];
             for (int i = currNode->currKeyNum + 1; i > 0; i--){
-                currNode->nodePtrs[i] = currNode->nodePtrs[i - 1];
+                currNode->nodePtrs[i] = currNode->nodePtrs[i - 1];//make space to insert new pointers
             }
-            currNode->nodePtrs[0] = leftNode->nodePtrs[leftNode->currKeyNum];
+            currNode->nodePtrs[0] = leftNode->nodePtrs[leftNode->currKeyNum]; //put the borrowed sibling pointer inside
             currNode->currKeyNum++;
             leftNode->currKeyNum--;
             //updateHeightAndBalanceFactor(currNode);//update height and balance factor
@@ -758,6 +787,68 @@ public:
         deleteInternal(parent->keys[rightSibling - 1], parent, rightNode);
     }
   }
+
+  int getN() const {
+        return MAX_KEY;
+    }
+int getNumNodes(Node* node) {
+    if (node == nullptr) {
+        return 0;
+    }
+    int count = 1; // Count the current node
+    if (!node->isLeaf) {
+        for (int i = 0; i <= node->currKeyNum; i++) {
+            count += getNumNodes(node->nodePtrs[i]);
+        }
+    }
+    return count;
+}
+
+int getNumNodes() {
+    return getNumNodes(root);
+}
+
+int getNumLevels(Node* node) {
+    if (node == nullptr) {
+        return 0;
+    }
+    if (node->isLeaf) {
+        return 1;
+    }
+    return 1 + getNumLevels(node->nodePtrs[0]); // Assume all child nodes have the same level.
+}
+
+int getNumLevels() {
+    return getNumLevels(root);
+}
+void printRoot() {
+    if (root == nullptr || root->currKeyNum == 0) {
+        std::cout << "Empty root" << std::endl;
+        return;
+    }
+
+    for (int i = 0; i < root->currKeyNum; i++) {
+        std::cout << root->keys[i];
+        if (i < root->currKeyNum - 1) {
+            std::cout << ", ";
+        }
+    }
+}
+
+    // Destructor to free memory
+    ~BPlusTree() {
+        destroyTree(root);
+    }
+
+    void destroyTree(Node* node) {
+        if (node) {
+            for (int i = 0; i < node->currKeyNum; ++i) {
+                destroyTree(node->nodePtrs[i]);
+                delete node->nodePtrs[i];
+            }
+            delete node;
+        }
+    }
 };
 
 #endif
