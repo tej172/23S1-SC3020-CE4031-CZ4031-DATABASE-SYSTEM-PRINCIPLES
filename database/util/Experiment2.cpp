@@ -60,7 +60,7 @@ int main() {
     }
 
     // Create a B+ tree for Experiment 2
-    BPlusTree bPlusTree(32);
+    BPlusTree bPlusTree(6);
 
     // Read and process each line from the input file
     string line;

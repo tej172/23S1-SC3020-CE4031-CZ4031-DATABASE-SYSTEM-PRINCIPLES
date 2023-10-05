@@ -791,7 +791,7 @@ public:
   int getN() const {
     int sizeofkey = 4;
     int blocksize = 400; 
-    int sizeofptr = 8; 
+    int sizeofptr = 4; 
     int n = (blocksize-sizeofptr)/(sizeofkey+sizeofptr);
     return n;
     }
