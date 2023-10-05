@@ -62,7 +62,7 @@ int main() {
     }
 
     // Create a B+ tree for Experiment 2
-    BPlusTree bPlusTree(3);
+    BPlusTree bPlusTree(6);
 
     // Read and process each line from the input file
     string line;
@@ -152,9 +152,7 @@ int main() {
 
     cout << "Content of the Root Node (only keys): ";
     bPlusTree.printRoot();
-    // cout << endl;
 
-    // return 0;
 
 
     // Experiment 3: Retrieve records with "FG_PCT_home" equal to 0.5
@@ -210,59 +208,59 @@ int main() {
 }
 
 
-void linearScan(const Disk& disk, float searchKey, size_t recordSize) {
-    // Initialize statistics for linear scan
-    int dataBlockAccessCount = 0;
-    double avgFG3_PCT_home = 0.0;
+// void linearScan(const Disk& disk, float searchKey, size_t recordSize) {
+//     // Initialize statistics for linear scan
+//     int dataBlockAccessCount = 0;
+//     double avgFG3_PCT_home = 0.0;
 
-    // Measure the running time
-    auto start_time = std::chrono::high_resolution_clock::now();
+//     // Measure the running time
+//     auto start_time = std::chrono::high_resolution_clock::now();
 
-    // Iterate through all data blocks
-    for (int blockNumber = 0; blockNumber < disk.getNumBlocks(); ++blockNumber) {
-        // Load the data block from disk
-        void* blockData = disk.loadDataBlockFromDisk(blockNumber);
+//     // Iterate through all data blocks
+//     for (int blockNumber = 0; blockNumber < disk.getNumBlocks(); ++blockNumber) {
+//         // Load the data block from disk
+//         void* blockData = disk.loadDataBlockFromDisk(blockNumber);
 
-        // Calculate the number of records in the block
-        int numRecordsInBlock = disk.getNumRecordsInBlock(blockData, recordSize);
+//         // Calculate the number of records in the block
+//         int numRecordsInBlock = disk.getNumRecordsInBlock(blockData, recordSize);
 
-        // Iterate through records in the block
-        for (int recordIndex = 0; recordIndex < numRecordsInBlock; ++recordIndex) {
-            // Load the record from the block
-            void* recordData = disk.loadRecordFromBlock(blockData, recordIndex, recordSize);
+//         // Iterate through records in the block
+//         for (int recordIndex = 0; recordIndex < numRecordsInBlock; ++recordIndex) {
+//             // Load the record from the block
+//             void* recordData = disk.loadRecordFromBlock(blockData, recordIndex, recordSize);
 
-            // Extract the relevant field (e.g., FG_PCT_home) from the record data
-            float recordFG_PCT_home = *reinterpret_cast<float*>(recordData);
+//             // Extract the relevant field (e.g., FG_PCT_home) from the record data
+//             float recordFG_PCT_home = *reinterpret_cast<float*>(recordData);
 
-            // Check if the record matches the search criteria
-            if (recordFG_PCT_home == searchKey) {
-                // Increment data block access count
-                dataBlockAccessCount++;
+//             // Check if the record matches the search criteria
+//             if (recordFG_PCT_home == searchKey) {
+//                 // Increment data block access count
+//                 dataBlockAccessCount++;
 
-                // Calculate average "FG3_PCT_home"
-                avgFG3_PCT_home += recordFG_PCT_home;
-            }
+//                 // Calculate average "FG3_PCT_home"
+//                 avgFG3_PCT_home += recordFG_PCT_home;
+//             }
 
-            // Deallocate the loaded record data
-            delete[] recordData;
-        }
+//             // Deallocate the loaded record data
+//             delete[] recordData;
+//         }
 
-        // Deallocate the loaded block data
-        delete[] blockData;
-    }
+//         // Deallocate the loaded block data
+//         delete[] blockData;
+//     }
 
-    // Calculate the final average
-    if (dataBlockAccessCount > 0) {
-        avgFG3_PCT_home /= dataBlockAccessCount;
-    }
+//     // Calculate the final average
+//     if (dataBlockAccessCount > 0) {
+//         avgFG3_PCT_home /= dataBlockAccessCount;
+//     }
 
-    // Measure the running time
-    auto end_time = std::chrono::high_resolution_clock::now();
-    auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+//     // Measure the running time
+//     auto end_time = std::chrono::high_resolution_clock::now();
+//     auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 
-    // Print the statistics for the linear scan
-    cout << "Linear Scan Statistics:" << endl;
-    cout << "Number of Data Blocks Accessed (Linear Scan): " << dataBlockAccessCount << endl;
-    cout << "Average FG3_PCT_home of Matching Records (Linear Scan): " << avgFG3_PCT_home << endl;
-    cout << "Running Time of Linear Scan: " << elapsed_time.count() << " ms" << endl;
-}
+//     // Print the statistics for the linear scan
+//     cout << "Linear Scan Statistics:" << endl;
+//     cout << "Number of Data Blocks Accessed (Linear Scan): " << dataBlockAccessCount << endl;
+//     cout << "Average FG3_PCT_home of Matching Records (Linear Scan): " << avgFG3_PCT_home << endl;
+//     cout << "Running Time of Linear Scan: " << elapsed_time.count() << " ms" << endl;
+// }
