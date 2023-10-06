@@ -49,8 +49,6 @@ public:
         return this->root;
     }
 
-	
-
     Node<T>* BPlusTreeSearch(Node<T>* node, T key){
         if(node == nullptr) { // if root is null, return nullptr
             return nullptr;
@@ -81,6 +79,7 @@ public:
             return nullptr;
         }
     }
+    
     Node<T>* BPlusTreeRangeSearch(Node<T>* node, T key){
         if(node == nullptr) { // if root is null, return nullptr
             return nullptr;
@@ -103,6 +102,7 @@ public:
             return cursor;
         }
     }
+    
     int range_search(T start, T end, T* result_data, int arr_length) {
         int index=0;
 
@@ -125,6 +125,7 @@ public:
         }
         return index;
     }
+    
     bool search(T data) {  // Return true if the item exists. Return false if it does not.
         return BPlusTreeSearch(this->root, data) != nullptr;
     }
@@ -143,6 +144,7 @@ public:
         }
         return index;
     }
+    
     T* item_insert(T* arr, T data, int len){
         int index = 0;
         for(int i=0; i<len; i++){
@@ -164,6 +166,7 @@ public:
 
         return arr;
     }
+    
     Node<T>** child_insert(Node<T>** child_arr, Node<T>*child,int len,int index){
         for(int i= len; i > index; i--){
             child_arr[i] = child_arr[i - 1];
@@ -171,6 +174,7 @@ public:
         child_arr[index] = child;
         return child_arr;
     }
+    
     Node<T>* child_item_insert(Node<T>* node, T data, Node<T>* child){
         int item_index=0;
         int child_index=0;
@@ -198,6 +202,7 @@ public:
 
         return node;
     }
+    
     void InsertPar(Node<T>* par,Node<T>* child, T data){
         //overflow check
         Node<T>* cursor = par;
@@ -275,6 +280,7 @@ public:
             }
         }
     }
+    
     void insert(T data) {
         if(this->root == nullptr){ //if the tree is empty
             this->root = new Node<T>(this->degree);
@@ -749,6 +755,7 @@ public:
             delete cursor;
         }
     }
+    
     void bpt_print(){
         print(this->root);
     }
@@ -856,5 +863,73 @@ public:
 
     return count;
   }
+
+
+
+  int getN() const {
+    return degree; 
+    }
+
+int getNumNodes(Node* node) {
+    if (node == nullptr) {
+        return 0;
+    }
+    int count = 1; // Count the current node
+    if (!node->isLeaf) {
+        for (int i = 0; i <= node->currKeyNum; i++) {
+            count += getNumNodes(node->nodePtrs[i]);
+        }
+    }
+    return count;
+}
+
+int getNumNodes() {
+    return getNumNodes(root);
+}
+
+int getNumLevels(Node* node) {
+    if (node == nullptr) {
+        return 0;
+    }
+    if (node->isLeaf) {
+        return 1;
+    }
+    return 1 + getNumLevels(node->nodePtrs[0]); // Assume all child nodes have the same level.
+}
+
+int getNumLevels() {
+    return getNumLevels(root);
+}
+void printRoot() {
+    if (root == nullptr || root->currKeyNum == 0) {
+        std::cout << "Empty root" << std::endl;
+        return;
+    }
+
+    for (int i = 0; i < root->currKeyNum; i++) {
+        std::cout << root->keys[i];
+        if (i < root->currKeyNum - 1) {
+            std::cout << ", ";
+        }
+    }
+}
+
+    // Destructor to free memory
+    ~BPlusTree() {
+        destroyTree(root);
+    }
+
+    void destroyTree(Node* node) {
+        if (node) {
+            for (int i = 0; i < node->currKeyNum; ++i) {
+                destroyTree(node->nodePtrs[i]);
+                delete node->nodePtrs[i];
+            }
+            delete node;
+        }
+    }
+    int getNumIndexNodesAccessed() const {
+        return numIndexNodesAccessed;
+    }
 
 };
