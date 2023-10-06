@@ -13,6 +13,7 @@ Disk::Disk(int blockSize, int diskSize) {
     this->startDisk = operator new(diskSize);
     this->block = startDisk;
     this->currBlockMemUsed = 0;
+    this->totalBlocks = diskSize / blockSize; // Calculate totalBlocks
 }
 
 bool Disk::allocateOneBlock() {
@@ -112,3 +113,15 @@ void* Disk::loadRecordFromBlock(const void* blockData, int recordIndex, std::siz
     return (char*)blockData + recordIndex * recordSize;
 }
 
+Address Disk::getNextBlockAddress(const Address& currentAddress) const {
+    // Calculate the address of the next block based on the current block's address
+
+    // Check if we're at the last block
+    if (currentAddress.blkNumber >= (totalBlocks - 1)) {
+        Address nextBlockAddress = { -1, -1 }; // Return -1 to indicate the end
+        return nextBlockAddress;
+    }
+
+    Address nextBlockAddress = { currentAddress.blkNumber + 1, 0 }; // Go to the next block
+    return nextBlockAddress;
+}

@@ -39,6 +39,8 @@ public:
      int getNumBlocks() const {
         return totalBlocks;
     }
+
+     Address getNextBlockAddress(const Address& currentAddress) const;
       // Destructor
 //   ~Disk();
 };

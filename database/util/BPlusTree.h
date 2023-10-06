@@ -18,6 +18,7 @@ class BPlusTree
 //   int MAX_KEY;   
 //   void insertInternal(float key, Node *cursorDiskAddress, Node *childDiskAddress);
 private:
+  int numIndexNodesAccessed;
     int countNodesRecursively(Node* node) const {
         if (!node)
             return 0;
@@ -349,20 +350,40 @@ public:
         //std::cout << "[KEY NOT FOUND] \n";
         return nullptr;
   };
-  Address * findSearchKey(float searchKey){ //change the return to address once its set up
-    Node * node = findCorrectNodeForKey(searchKey, this->root);
-    if (node != nullptr){
-    for (int i=0; i< node->currKeyNum; i++){
-        if (node->keys[i] == searchKey){
+
+//   Address * findSearchKey(float searchKey, int numIndexNodesAccessed){ //change the return to address once its set up
+//     Node * node = findCorrectNodeForKey(searchKey, this->root);
+//     if (node != nullptr){
+//     for (int i=0; i< node->currKeyNum; i++){
+//         if (node->keys[i] == searchKey){
+//                 std::cout << "[KEY FOUND] \n";
+//                 Address* addressPointer = &node->addressPtrs[i];
+//                 // numIndexNodesAccessed++;
+//                 return addressPointer;
+//             }
+//     }}
+    
+//     std::cout << "[KEY NOT FOUND] \n";
+//     return nullptr;
+//   }
+
+std::vector<Address*> findSearchKey(float searchKey, int& numIndexNodesAccessed) {
+    std::vector<Address*> addresses; // Create a vector to store the addresses
+    Node* node = findCorrectNodeForKey(searchKey, this->root);
+
+    if (node != nullptr) {
+        for (int i = 0; i < node->currKeyNum; i++) {
+            if (node->keys[i] == searchKey) {
                 std::cout << "[KEY FOUND] \n";
                 Address* addressPointer = &node->addressPtrs[i];
-                return addressPointer;
+                addresses.push_back(addressPointer); // Collect the address
+                numIndexNodesAccessed++;
             }
-    }}
-    
-    std::cout << "[KEY NOT FOUND] \n";
-    return nullptr;
-  }
+        }
+    }
+
+    return addresses; // Return the vector of addresses
+}
 
   void printTree(Node *displayNode){
     std::cout << "===============================\n";
@@ -387,6 +408,7 @@ public:
     }
     std::cout << "===============================\n";
   }
+
   void deleteNode(float key)
   {
     if(root == NULL){
@@ -613,6 +635,7 @@ public:
         
     }
   }
+  
   void deleteInternal(float key, Node *currNode, Node *child){ //touch-upcode
     //
     //    
@@ -789,12 +812,9 @@ public:
   }
 
   int getN() const {
-    int sizeofkey = 4;
-    int blocksize = 400; 
-    int sizeofptr = 4; 
-    int n = (blocksize-sizeofptr)/(sizeofkey+sizeofptr);
-    return n;
+return MAX_KEY; 
     }
+
 int getNumNodes(Node* node) {
     if (node == nullptr) {
         return 0;
@@ -852,6 +872,9 @@ void printRoot() {
             }
             delete node;
         }
+    }
+    int getNumIndexNodesAccessed() const {
+        return numIndexNodesAccessed;
     }
 };
 
