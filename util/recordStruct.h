@@ -4,8 +4,11 @@
 #include <stdexcept>
 #include <cstddef>
 #include <string>
+#include "Address.h"
 
 struct recordStruct {
+    Address address;
+    
     std::string GAME_DATE_EST;
     int TEAM_ID_home;
     int PTS_home;

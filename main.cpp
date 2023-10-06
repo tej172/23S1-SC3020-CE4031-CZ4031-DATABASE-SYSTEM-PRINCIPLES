@@ -18,6 +18,7 @@ int main(){
 	BPlusTree<float> BPtree = BPlusTree<float>(6);
 	int countRecord = 0;
     ifstream inputFile("Data/games.txt");
+	
     if (!inputFile.is_open()) {
         cerr << "Error: Unable to open input file." << endl;
         return 1;

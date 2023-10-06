@@ -5,6 +5,7 @@ class Address {
     public:
         int blkNumber;
         int offset;
+        Address(){}
         Address(int blkNumber, int offset){
             this->blkNumber = blkNumber;
             this->offset = offset;
