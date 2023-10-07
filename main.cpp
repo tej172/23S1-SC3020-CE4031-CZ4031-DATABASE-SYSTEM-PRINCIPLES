@@ -8,13 +8,17 @@
 #include <cstring>
 #include <ctime>
 #include <cstdlib>
+#include <vector>
 #include "BPlusTree/BPlusTree.h"
 #include "util/recordStruct.h"
 #include "util/data_utils.cpp"
+#include "Disk/Disk.h"
 using namespace std;
 
 
 int main(){
+	Disk disk = Disk(400, 300000000);
+
 	BPlusTree<float> BPtree = BPlusTree<float>(6);
 	int countRecord = 0;
     ifstream inputFile("Data/games.txt");
@@ -28,9 +32,9 @@ int main(){
 		// Split the line into fields
 		char* token = strtok(const_cast<char*>(line.c_str()), "\t");
 		recordStruct record;
-
+		
 		// Parse and store data in the recordStruct
-		for (size_t i = 0; i < NUM_FIELDS && token; ++i) {
+		for (size_t i = 0; i < recordStruct::NUM_FIELDS && token; ++i) {
 			switch (i) {
 			
 				case 0: // GAME_DATE_EST
@@ -67,11 +71,22 @@ int main(){
 		}
 		if (record.FG_PCT_home >= 0.6 && record.FG_PCT_home <= 1){
 			countRecord++;}
-		BPtree.insert(record.FG_PCT_home);
+		Address address = disk.saveDataToDisk(&record, sizeof(recordStruct));
+
+		BPtree.insert(record.FG_PCT_home, address);
 	}
 	std::cout << "the record count is: " << countRecord << "\n";
-	int res = BPtree.findKeyRange(0.5, 0.5);
-	std::cout << "the record count is: " << res;
+	vector<Address> res = BPtree.findKeyRange(0.5, 0.5);
+	std::cout << "the record count is: " << res.size();
+
+	for (int i=0; i< res.size(); i++){
+		void* data = disk.loadDataFromDisk(res[i], sizeof(recordStruct));
+		recordStruct* loadedRecord = static_cast<recordStruct*>(data);
+		if (loadedRecord->FG_PCT_home != 0.5){
+			std::cout << "ERROR";
+			std::cout << "Data from the record: " << loadedRecord->FG_PCT_home;
+		}
+	}
 
 	return 0;
 }

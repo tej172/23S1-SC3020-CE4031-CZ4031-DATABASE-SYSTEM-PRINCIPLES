@@ -1,22 +1,30 @@
-const size_t FIELD_SIZES[] = {
-    10, // GAME_DATE_EST
-    4,  // TEAM_ID_home
-    4,  // PTS_home
-    4,  // FG_PCT_home
-    4,  // FT_PCT_home
-    4,  // FG3_PCT_home
-    4,  // AST_home
-    4,  // REB_home
-    1   // HOME_TEAM_WINS
-};
-
-const size_t NUM_FIELDS = sizeof(FIELD_SIZES) / sizeof(FIELD_SIZES[0]);
-
 // Function to calculate the size of a record
-size_t calculateRecordSize() {
+size_t calculateRecordSize(const recordStruct& record) {
     size_t recordSize = 0;
-    for (size_t i = 0; i < NUM_FIELDS; ++i) {
-        recordSize += FIELD_SIZES[i];
+    for (size_t i = 0; i < recordStruct::NUM_FIELDS; ++i) {
+        switch (i) {
+            case 0:
+                recordSize += record.GAME_DATE_EST.size();
+                break;
+            case 1:
+            case 2:
+                recordSize += sizeof(int);
+                break;
+            case 3:
+            case 4:
+            case 5:
+                recordSize += sizeof(float);
+                break;
+            case 6:
+            case 7:
+                recordSize += sizeof(int);
+                break;
+            case 8:
+                recordSize += sizeof(bool);
+                break;
+            default:
+                break;
+        }
     }
     return recordSize;
 }

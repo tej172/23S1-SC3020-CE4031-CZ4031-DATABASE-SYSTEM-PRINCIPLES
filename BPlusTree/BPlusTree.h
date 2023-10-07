@@ -1,3 +1,5 @@
+#include <vector>
+#include "../util/Address.h"
 
 template <typename T>
 struct Node {
@@ -7,6 +9,7 @@ struct Node {
     T* item;
     Node<T>** children;
     Node<T>* parent;
+    Address * address;
 
 public:
     Node(std::size_t _degree) {// Constructor
@@ -19,6 +22,7 @@ public:
             _item[i] = 0;
         }
         this->item = _item;
+        
 
         Node<T>** _children = new Node<T>*[degree];
         for(int i=0; i<degree; i++){
@@ -26,8 +30,8 @@ public:
         }
         this->children = _children;
 
+        address = new Address[degree];
         this->parent = nullptr;
-
     }
 };
 
@@ -49,38 +53,6 @@ public:
         return this->root;
     }
 
-	
-
-    Node<T>* BPlusTreeSearch(Node<T>* node, T key){
-        if(node == nullptr) { // if root is null, return nullptr
-            return nullptr;
-        }
-        else{
-            Node<T>* cursor = node; // cursor finding key
-
-            while(!cursor->is_leaf){ // until cusor pointer arrive leaf
-                for(int i=0; i<cursor->size; i++){ //in this index node, find what we want key
-                    if(key < cursor->item[i]){ //find some range, and let find their child also.
-                        cursor = cursor->children[i];
-                        break;
-                    }
-                    if(i == (cursor->size)-1){
-                        cursor = cursor->children[i+1];
-                        break;
-                    }
-                }
-            }
-
-            //search for the key if it exists in leaf node.
-            for(int i=0; i<cursor->size; i++){
-                if(cursor->item[i] == key){
-                    return cursor;
-                }
-            }
-
-            return nullptr;
-        }
-    }
     Node<T>* BPlusTreeRangeSearch(Node<T>* node, T key){
         if(node == nullptr) { // if root is null, return nullptr
             return nullptr;
@@ -102,31 +74,6 @@ public:
             }
             return cursor;
         }
-    }
-    int range_search(T start, T end, T* result_data, int arr_length) {
-        int index=0;
-
-        Node<T>* start_node = BPlusTreeRangeSearch(this->root,start);
-        Node<T>* cursor = start_node;
-        T temp= cursor->item[0];
-
-        while(temp<=end){
-            if(cursor == nullptr){
-                break;
-            }
-            for(int i=0; i< cursor->size;i++){
-                temp = cursor->item[i];
-                if((temp >= start)&&(temp <= end)){
-                    result_data[index] = temp;
-                    index++;
-                }
-            }
-            cursor = cursor->children[cursor->size];
-        }
-        return index;
-    }
-    bool search(T data) {  // Return true if the item exists. Return false if it does not.
-        return BPlusTreeSearch(this->root, data) != nullptr;
     }
 
     int find_index(T* arr, T data, int len){
@@ -164,9 +111,25 @@ public:
 
         return arr;
     }
+    int get_index(T* item_array, T data, int len){
+        int index = 0;
+        for(int i=0; i<len; i++){
+            if(data < item_array[i]){
+                index = i;
+                break;
+            }
+            if(i==len-1){
+                index = len;
+                break;
+            }
+        }
+
+        return index;
+    }
     Node<T>** child_insert(Node<T>** child_arr, Node<T>*child,int len,int index){
         for(int i= len; i > index; i--){
             child_arr[i] = child_arr[i - 1];
+
         }
         child_arr[index] = child;
         return child_arr;
@@ -213,10 +176,13 @@ public:
 
             //copy item
             T* item_copy = new T[cursor->size+1];
+
             for(int i=0; i<cursor->size; i++){
                 item_copy[i] = cursor->item[i];
+
             }
             item_copy = item_insert(item_copy,data,cursor->size);
+
 
             auto** child_copy = new Node<T>*[cursor->size+2];
             for(int i=0; i<cursor->size+1;i++){
@@ -239,7 +205,6 @@ public:
                 cursor->children[i] = child_copy[i];
             }
             cursor->children[cursor->size] = child_copy[cursor->size];
-            //todo 안지워짐. 뒤에것.
 
             for(int i=0; i < Newnode->size; i++){
                 Newnode->item[i] = item_copy[cursor->size + i +1];
@@ -275,11 +240,12 @@ public:
             }
         }
     }
-    void insert(T data) {
+    void insert(T data, Address address) {
         if(this->root == nullptr){ //if the tree is empty
             this->root = new Node<T>(this->degree);
             this->root->is_leaf = true;
             this->root->item[0] = data;
+            this->root->address[0] = address;
             this->root->size = 1; //
         }
         else{ //if the tree has at least one node
@@ -290,8 +256,17 @@ public:
 
             //overflow check
             if(cursor->size < (this->degree-1)){ // not overflow, just insert in the correct position
-                //item insert and rearrange
-                cursor->item = item_insert(cursor->item,data,cursor->size);
+                //item insert and 
+                int index = get_index(cursor->item,data,cursor->size);
+
+                for(int i = cursor->size; i > index; i--){
+                    cursor->item[i] = cursor->item[i-1];
+                    cursor->address[i] = cursor->address[i-1];
+                }
+
+                cursor->item[index] = data;
+                cursor->address[index] = address;
+
                 cursor->size++;
                 //edit pointer(next node)
                 cursor->children[cursor->size] = cursor->children[cursor->size-1];
@@ -305,12 +280,22 @@ public:
 
                 //copy item
                 T* item_copy = new T[cursor->size+1];
+                Address * address_copy = new Address[cursor->size+1];
                 for(int i=0; i<cursor->size; i++){
                     item_copy[i] = cursor->item[i];
+                    address_copy[i] = cursor->address[i];
                 }
 
                 //insert and rearrange
-                item_copy = item_insert(item_copy,data,cursor->size);
+                int index = get_index(item_copy,data,cursor->size);
+
+                for(int i = cursor->size; i > index; i--){
+                    item_copy[i] = item_copy[i-1];
+                    address_copy[i] = address_copy[i-1];
+                }
+
+                item_copy[index] = data;
+                address_copy[index] = address;
 
                 //split nodes
                 cursor->size = (this->degree)/2;
@@ -323,9 +308,11 @@ public:
 
                 for(int i=0; i<cursor->size;i++){
                     cursor->item[i] = item_copy[i];
+                    cursor->address[i] = address_copy[i];
                 }
                 for(int i=0; i < Newnode->size; i++){
                     Newnode->item[i] = item_copy[cursor->size + i];
+                    Newnode->address[i] = address_copy[cursor->size + i];
                 }
 
                 cursor->children[cursor->size] = Newnode;
@@ -333,7 +320,8 @@ public:
                 cursor->children[this->degree-1] = nullptr;
 
                 delete[] item_copy;
-
+                delete[] address_copy;
+                
                 //parent check
                 T paritem = Newnode->item[0];
 
@@ -821,15 +809,16 @@ public:
   };
 
 
-  int findKeyRange(float startKey, float endKey){
+  std::vector<Address> findKeyRange(float startKey, float endKey){
     Node<float> * currNode = findCorrectNodeForKey(startKey, getroot());
     bool keepSearching = true;
-    // std::vector<Address> vec;
+    std::vector<Address> vec;
     int count = 0;
 
     if(currNode != nullptr){
         for (int i=0; i< currNode->size; i++){
             if (currNode->item[i] >= startKey && currNode->item[i] <= endKey){
+                vec.push_back(currNode->address[i]); 
                 count ++; 
                 keepSearching = true;
             }else{
@@ -843,18 +832,18 @@ public:
             currNode = currNode->children[currNode->size];
             for (int i=0; i< currNode->size; i++){
                 if (currNode->item[i] >= startKey && currNode->item[i] <= endKey){
+                    vec.push_back(currNode->address[i]);
                     count ++; 
                 }else{
                     keepSearching = false;
-                    return count;
+                    return vec;
                 }
             }
         }else{
             keepSearching= false;
         }
     }
-
-    return count;
+    return vec;
   }
 
 };
