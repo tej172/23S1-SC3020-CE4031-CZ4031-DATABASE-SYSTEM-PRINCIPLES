@@ -818,7 +818,7 @@ public:
             currNode = currNode->children[0];
         }
 
-        std::cout << "LEFTMOST VALUE::  " << currNode->key[0] << "\n";
+        std::cout << "\nLEFTMOST VALUE::  " << currNode->key[0] << "\n";
         //return currNode->item[0];
         return currNode;
 
@@ -846,6 +846,7 @@ public:
             {
                 if (currNode->key[j] >= startKey && currNode->key[j] <= endKey)
                 {
+                    std::cout << "\nkey " << j << "  is " << currNode->key[j];
                     remove(currNode->key[j]);
                     delCount++;
                     keepDeleting = true;
@@ -866,6 +867,7 @@ public:
                 {
                     if (currNode->key[i] >= startKey && currNode->key[i] <= endKey)
                     {
+                        std::cout << "\nkey "<<i<< "  is " << currNode->key[i];
                         remove(currNode->key[i]);
 
                         delCount++;
