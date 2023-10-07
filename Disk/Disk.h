@@ -49,7 +49,14 @@ class Disk {
             ptrdiff_t sizeUsed = (char*)block + currBlockMemUsed - (char*)startDisk;
             return static_cast<int>(sizeUsed);
         }
+        int getBlockSize() const {
+            return blockSize;
+        }
 
+    int getCurrBlockMemUsed() const {
+        return currBlockMemUsed;
+    }
+  
 
     private:
         int diskSize;
