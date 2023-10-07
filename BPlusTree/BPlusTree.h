@@ -783,6 +783,8 @@ public:
         bool keepDeleting = true;
         int delCount=0;
 
+        std::cout << "\nCOUNT 1 IS: " << delCount << "\n";
+
         //for (int i=0; i< delValues.size(); i++){
             //remove(delValues[i]);
             //std::cout << "VALUE IS: " << delValues.size();
@@ -803,6 +805,8 @@ public:
                 }
             }
         }
+        std::cout << "\nCOUNT 2 IS: " << delCount << "\n";
+
         while (keepDeleting == true)
         {
             if (currNode->children[currNode->size] != nullptr){
@@ -830,8 +834,8 @@ public:
         
         //}
 
-        std::cout << "keepDeleting IS:: "<< keepDeleting << "\n";
-        std::cout << "COUNT IS: " << delCount << "\n";
+        std::cout << "\nkeepDeleting(BOOL) IS:: "<< keepDeleting << "\n";
+        std::cout << "FINAL COUNT IS: " << delCount << "\n";
 
         return delCount;
         
