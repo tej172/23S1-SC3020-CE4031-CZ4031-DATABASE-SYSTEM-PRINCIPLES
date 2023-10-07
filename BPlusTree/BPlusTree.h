@@ -3,34 +3,34 @@
 
 template <typename T>
 struct Node {
-    bool is_leaf;
-    std::size_t degree; // maximum number of children
-    std::size_t size; // current number of item
-    T* item;
+    bool isLeaf;
+    std::size_t maxKey; // maximum number of children
+    std::size_t size; // current number of key
+    T* key;
     Node<T>** children;
     Node<T>* parent;
     Address * address;
 
 public:
-    Node(std::size_t _degree) {// Constructor
-        this->is_leaf = false;
-        this->degree = _degree;
+    Node(std::size_t _maxKey) {// Constructor
+        this->isLeaf = false;
+        this->maxKey = _maxKey;
         this->size = 0;
 
-        T* _item = new T[degree-1];
-        for(int i=0; i<degree-1; i++){
-            _item[i] = 0;
+        T* _key = new T[maxKey-1];
+        for(int i=0; i<maxKey-1; i++){
+            _key[i] = 0;
         }
-        this->item = _item;
+        this->key = _key;
         
 
-        Node<T>** _children = new Node<T>*[degree];
-        for(int i=0; i<degree; i++){
+        Node<T>** _children = new Node<T>*[maxKey];
+        for(int i=0; i<maxKey; i++){
             _children[i] = nullptr;
         }
         this->children = _children;
 
-        address = new Address[degree];
+        address = new Address[maxKey];
         this->parent = nullptr;
     }
 };
@@ -38,12 +38,12 @@ public:
 template <typename T>
 class BPlusTree {
     Node<T>* root;
-    std::size_t degree;
+    std::size_t maxKey;
 
 public:
-    BPlusTree(std::size_t _degree) {// Constructor
+    BPlusTree(std::size_t _maxKey) {// Constructor
         this->root = nullptr;
-        this->degree = _degree;
+        this->maxKey = _maxKey;
     }
     ~BPlusTree() { // Destructor
         clear(this->root);
@@ -60,9 +60,9 @@ public:
         else{
             Node<T>* cursor = node; // cursor finding key
 
-            while(!cursor->is_leaf){ // until cusor pointer arrive leaf
+            while(!cursor->isLeaf){ // until cusor pointer arrive leaf
                 for(int i=0; i<cursor->size; i++){ //in this index node, find what we want key
-                    if(key < cursor->item[i]){ //find some range, and let find their child also.
+                    if(key < cursor->key[i]){ //find some range, and let find their child also.
                         cursor = cursor->children[i];
                         break;
                     }
@@ -76,7 +76,7 @@ public:
         }
     }
 
-    int find_index(T* arr, T data, int len){
+    int findIndex(T* arr, T data, int len){
         int index = 0;
         for(int i=0; i<len; i++){
             if(data < arr[i]){
@@ -90,7 +90,7 @@ public:
         }
         return index;
     }
-    T* item_insert(T* arr, T data, int len){
+    T* keyInsert(T* arr, T data, int len){
         int index = 0;
         for(int i=0; i<len; i++){
             if(data < arr[i]){
@@ -111,10 +111,10 @@ public:
 
         return arr;
     }
-    int get_index(T* item_array, T data, int len){
+    int getIndex(T* key_array, T data, int len){
         int index = 0;
         for(int i=0; i<len; i++){
-            if(data < item_array[i]){
+            if(data < key_array[i]){
                 index = i;
                 break;
             }
@@ -126,7 +126,7 @@ public:
 
         return index;
     }
-    Node<T>** child_insert(Node<T>** child_arr, Node<T>*child,int len,int index){
+    Node<T>** childrenInsert(Node<T>** child_arr, Node<T>*child,int len,int index){
         for(int i= len; i > index; i--){
             child_arr[i] = child_arr[i - 1];
 
@@ -134,54 +134,54 @@ public:
         child_arr[index] = child;
         return child_arr;
     }
-    Node<T>* child_item_insert(Node<T>* node, T data, Node<T>* child){
-        int item_index=0;
+    Node<T>* childrenKeyInsert(Node<T>* node, T data, Node<T>* child){
+        int key_index=0;
         int child_index=0;
         for(int i=0; i< node->size; i++){
-            if(data < node->item[i]){
-                item_index = i;
+            if(data < node->key[i]){
+                key_index = i;
                 child_index = i+1;
                 break;
             }
             if(i==node->size-1){
-                item_index = node->size;
+                key_index = node->size;
                 child_index = node->size+1;
                 break;
             }
         }
-        for(int i = node->size;i > item_index; i--){
-            node->item[i] = node->item[i-1];
+        for(int i = node->size;i > key_index; i--){
+            node->key[i] = node->key[i-1];
         }
         for(int i=node->size+1;i>child_index;i--){
             node->children[i] = node->children[i-1];
         }
 
-        node->item[item_index] = data;
+        node->key[key_index] = data;
         node->children[child_index] = child;
 
         return node;
     }
-    void InsertPar(Node<T>* par,Node<T>* child, T data){
+    void parentInsert(Node<T>* par,Node<T>* child, T data){
         //overflow check
         Node<T>* cursor = par;
-        if(cursor->size < this->degree-1){//not overflow, just insert in the correct position
-            //insert item, child, and reallocate
-            cursor = child_item_insert(cursor,data,child);
+        if(cursor->size < this->maxKey-1){//not overflow, just insert in the correct position
+            //insert key, child, and reallocate
+            cursor = childrenKeyInsert(cursor,data,child);
             cursor->size++;
         }
         else{//overflow
             //make new node
-            auto* Newnode = new Node<T>(this->degree);
+            auto* Newnode = new Node<T>(this->maxKey);
             Newnode->parent = cursor->parent;
 
-            //copy item
-            T* item_copy = new T[cursor->size+1];
+            //copy key
+            T* key_copy = new T[cursor->size+1];
 
             for(int i=0; i<cursor->size; i++){
-                item_copy[i] = cursor->item[i];
+                key_copy[i] = cursor->key[i];
 
             }
-            item_copy = item_insert(item_copy,data,cursor->size);
+            key_copy = keyInsert(key_copy,data,cursor->size);
 
 
             auto** child_copy = new Node<T>*[cursor->size+2];
@@ -189,43 +189,43 @@ public:
                 child_copy[i] = cursor->children[i];
             }
             child_copy[cursor->size+1] = nullptr;
-            child_copy = child_insert(child_copy,child,cursor->size+1,find_index(item_copy,data,cursor->size+1));
+            child_copy = childrenInsert(child_copy,child,cursor->size+1,findIndex(key_copy,data,cursor->size+1));
 
             //split nodes
-            cursor->size = (this->degree)/2;
-            if((this->degree) % 2 == 0){
-                Newnode->size = (this->degree) / 2 -1;
+            cursor->size = (this->maxKey)/2;
+            if((this->maxKey) % 2 == 0){
+                Newnode->size = (this->maxKey) / 2 -1;
             }
             else{
-                Newnode->size = (this->degree) / 2;
+                Newnode->size = (this->maxKey) / 2;
             }
 
             for(int i=0; i<cursor->size;i++){
-                cursor->item[i] = item_copy[i];
+                cursor->key[i] = key_copy[i];
                 cursor->children[i] = child_copy[i];
             }
             cursor->children[cursor->size] = child_copy[cursor->size];
 
             for(int i=0; i < Newnode->size; i++){
-                Newnode->item[i] = item_copy[cursor->size + i +1];
+                Newnode->key[i] = key_copy[cursor->size + i +1];
                 Newnode->children[i] = child_copy[cursor->size+i+1];
                 Newnode->children[i]->parent=Newnode;
             }
             Newnode->children[Newnode->size] = child_copy[cursor->size+Newnode->size+1];
             Newnode->children[Newnode->size]->parent=Newnode;
 
-            T paritem = item_copy[this->degree/2];
+            T parkey = key_copy[this->maxKey/2];
 
-            delete[] item_copy;
+            delete[] key_copy;
             delete[] child_copy;
 
             //parent check
             if(cursor->parent == nullptr){//if there are no parent node(root case)
-                auto* Newparent = new Node<T>(this->degree);
+                auto* Newparent = new Node<T>(this->maxKey);
                 cursor->parent = Newparent;
                 Newnode->parent = Newparent;
 
-                Newparent->item[0] = paritem;
+                Newparent->key[0] = parkey;
                 Newparent->size++;
 
                 Newparent->children[0] = cursor;
@@ -236,15 +236,15 @@ public:
                 //delete Newparent;
             }
             else{//if there already have parent node
-                InsertPar(cursor->parent, Newnode, paritem);
+                parentInsert(cursor->parent, Newnode, parkey);
             }
         }
     }
     void insert(T data, Address address) {
         if(this->root == nullptr){ //if the tree is empty
-            this->root = new Node<T>(this->degree);
-            this->root->is_leaf = true;
-            this->root->item[0] = data;
+            this->root = new Node<T>(this->maxKey);
+            this->root->isLeaf = true;
+            this->root->key[0] = data;
             this->root->address[0] = address;
             this->root->size = 1; //
         }
@@ -255,16 +255,16 @@ public:
             cursor = BPlusTreeRangeSearch(cursor, data);
 
             //overflow check
-            if(cursor->size < (this->degree-1)){ // not overflow, just insert in the correct position
-                //item insert and 
-                int index = get_index(cursor->item,data,cursor->size);
+            if(cursor->size < (this->maxKey-1)){ // not overflow, just insert in the correct position
+                //key insert and 
+                int index = getIndex(cursor->key,data,cursor->size);
 
                 for(int i = cursor->size; i > index; i--){
-                    cursor->item[i] = cursor->item[i-1];
+                    cursor->key[i] = cursor->key[i-1];
                     cursor->address[i] = cursor->address[i-1];
                 }
 
-                cursor->item[index] = data;
+                cursor->key[index] = data;
                 cursor->address[index] = address;
 
                 cursor->size++;
@@ -274,63 +274,63 @@ public:
             }
             else{//overflow case
                 //make new node
-                auto* Newnode = new Node<T>(this->degree);
-                Newnode->is_leaf = true;
+                auto* Newnode = new Node<T>(this->maxKey);
+                Newnode->isLeaf = true;
                 Newnode->parent = cursor->parent;
 
-                //copy item
-                T* item_copy = new T[cursor->size+1];
+                //copy key
+                T* key_copy = new T[cursor->size+1];
                 Address * address_copy = new Address[cursor->size+1];
                 for(int i=0; i<cursor->size; i++){
-                    item_copy[i] = cursor->item[i];
+                    key_copy[i] = cursor->key[i];
                     address_copy[i] = cursor->address[i];
                 }
 
                 //insert and rearrange
-                int index = get_index(item_copy,data,cursor->size);
+                int index = getIndex(key_copy,data,cursor->size);
 
                 for(int i = cursor->size; i > index; i--){
-                    item_copy[i] = item_copy[i-1];
+                    key_copy[i] = key_copy[i-1];
                     address_copy[i] = address_copy[i-1];
                 }
 
-                item_copy[index] = data;
+                key_copy[index] = data;
                 address_copy[index] = address;
 
                 //split nodes
-                cursor->size = (this->degree)/2;
-                if((this->degree) % 2 == 0){
-                    Newnode->size = (this->degree) / 2;
+                cursor->size = (this->maxKey)/2;
+                if((this->maxKey) % 2 == 0){
+                    Newnode->size = (this->maxKey) / 2;
                 }
                 else{
-                    Newnode->size = (this->degree) / 2 + 1;
+                    Newnode->size = (this->maxKey) / 2 + 1;
                 }
 
                 for(int i=0; i<cursor->size;i++){
-                    cursor->item[i] = item_copy[i];
+                    cursor->key[i] = key_copy[i];
                     cursor->address[i] = address_copy[i];
                 }
                 for(int i=0; i < Newnode->size; i++){
-                    Newnode->item[i] = item_copy[cursor->size + i];
+                    Newnode->key[i] = key_copy[cursor->size + i];
                     Newnode->address[i] = address_copy[cursor->size + i];
                 }
 
                 cursor->children[cursor->size] = Newnode;
-                Newnode->children[Newnode->size] = cursor->children[this->degree-1];
-                cursor->children[this->degree-1] = nullptr;
+                Newnode->children[Newnode->size] = cursor->children[this->maxKey-1];
+                cursor->children[this->maxKey-1] = nullptr;
 
-                delete[] item_copy;
+                delete[] key_copy;
                 delete[] address_copy;
                 
                 //parent check
-                T paritem = Newnode->item[0];
+                T parkey = Newnode->key[0];
 
                 if(cursor->parent == nullptr){//if there are no parent node(root case)
-                    auto* Newparent = new Node<T>(this->degree);
+                    auto* Newparent = new Node<T>(this->maxKey);
                     cursor->parent = Newparent;
                     Newnode->parent = Newparent;
 
-                    Newparent->item[0] = paritem;
+                    Newparent->key[0] = parkey;
                     Newparent->size++;
 
                     Newparent->children[0] = cursor;
@@ -339,13 +339,13 @@ public:
                     this->root = Newparent;
                 }
                 else{//if there already have parent node
-                    InsertPar(cursor->parent, Newnode, paritem);
+                    parentInsert(cursor->parent, Newnode, parkey);
                 }
             }
         }
     }
 
-    void remove(T data) { // Remove an item from the tree.
+    void remove(T data) { // Remove an key from the tree.
         //make cursor
         Node<T>* cursor = this->root;
 
@@ -366,7 +366,7 @@ public:
         //find data
         int del_index=-1;
         for(int i=0; i< cursor->size; i++){
-            if(cursor->item[i] == data){
+            if(cursor->key[i] == data){
                 del_index = i;
                 break;
             }
@@ -378,9 +378,9 @@ public:
 
         //remove data
         for(int i=del_index; i<cursor->size-1;i++){
-            cursor->item[i] = cursor->item[i+1];
+            cursor->key[i] = cursor->key[i+1];
         }
-        cursor->item[cursor->size-1] = 0;
+        cursor->key[cursor->size-1] = 0;
         cursor->size--;
 
         //if cursor is root, and there are no more data -> clean!
@@ -397,23 +397,23 @@ public:
         if(cursor == this->root){
             return;
         }
-        if(cursor->size < degree/2){//underflow case
+        if(cursor->size < maxKey/2){//underflow case
 
             if(left >= 0){// left_sibiling exists
                 Node<T>* leftsibling= cursor->parent->children[left];
 
-                if(leftsibling->size > degree/2){ //if data number is enough to use this node
+                if(leftsibling->size > maxKey/2){ //if data number is enough to use this node
                     T* temp = new T[cursor->size+1];
 
-                    //copy item
+                    //copy key
                     for(int i=0; i<cursor->size; i++){
-                        temp[i]=cursor->item[i];
+                        temp[i]=cursor->key[i];
                     }
 
                     //insert and rearrange
-                    item_insert(temp,leftsibling->item[leftsibling->size -1],cursor->size);
+                    keyInsert(temp,leftsibling->key[leftsibling->size -1],cursor->size);
                     for(int i=0; i<cursor->size+1; i++){
-                        cursor->item[i] = temp[i];
+                        cursor->key[i] = temp[i];
                     }
                     cursor->size++;
                     delete[] temp;
@@ -423,13 +423,13 @@ public:
                     cursor->children[cursor->size-1] = nullptr;
 
                     //sibling property edit
-                    leftsibling->item[leftsibling->size-1] = 0;
+                    leftsibling->key[leftsibling->size-1] = 0;
                     leftsibling->size--;
                     leftsibling->children[leftsibling->size] = leftsibling->children[leftsibling->size+1]; //cursor
                     leftsibling->children[leftsibling->size+1]= nullptr;
 
                     //parent property edit
-                    cursor->parent->item[left] = cursor->item[0];
+                    cursor->parent->key[left] = cursor->key[0];
 
                     return;
                 }
@@ -437,17 +437,17 @@ public:
             if(right <= cursor->parent->size){// right_sibiling exists
                 Node<T>* rightsibling = cursor->parent->children[right];
 
-                if(rightsibling->size >degree/2){//if data number is enough to use this node
+                if(rightsibling->size >maxKey/2){//if data number is enough to use this node
                     T* temp = new T[cursor->size+1];
 
-                    //copy item
+                    //copy key
                     for(int i=0; i<cursor->size; i++){
-                        temp[i]=cursor->item[i];
+                        temp[i]=cursor->key[i];
                     }
                     //insert and rearrange
-                    item_insert(temp,rightsibling->item[0],cursor->size);
+                    keyInsert(temp,rightsibling->key[0],cursor->size);
                     for(int i=0; i<cursor->size+1; i++){
-                        cursor->item[i] = temp[i];
+                        cursor->key[i] = temp[i];
                     }
                     cursor->size++;
                     delete[] temp;
@@ -458,15 +458,15 @@ public:
 
                     //sibling property edit
                     for(int i=0; i<rightsibling->size-1;i++){
-                        rightsibling->item[i] = rightsibling->item[i+1];
+                        rightsibling->key[i] = rightsibling->key[i+1];
                     }
-                    rightsibling->item[rightsibling->size-1] = 0;
+                    rightsibling->key[rightsibling->size-1] = 0;
                     rightsibling->size--;
                     rightsibling->children[rightsibling->size] = rightsibling->children[rightsibling->size+1]; //cursor
                     rightsibling->children[rightsibling->size+1]= nullptr;
 
                     //parent property edit
-                    cursor->parent->item[right-1] = rightsibling->item[0];
+                    cursor->parent->key[right-1] = rightsibling->key[0];
 
                     return;
                 }
@@ -480,7 +480,7 @@ public:
 
                 //merge two leaf node
                 for(int i=0; i<cursor->size; i++){
-                    leftsibling->item[leftsibling->size+i]=cursor->item[i];
+                    leftsibling->key[leftsibling->size+i]=cursor->key[i];
                 }
                 //edit pointer
                 leftsibling->children[leftsibling->size] = nullptr;
@@ -488,14 +488,14 @@ public:
                 leftsibling->children[leftsibling->size] = cursor->children[cursor->size];
 
                 //parent property edit
-                Removepar(cursor, left, cursor->parent);
+                removeParent(cursor, left, cursor->parent);
                 for(int i=0; i<cursor->size;i++){
-                    cursor->item[i]=0;
+                    cursor->key[i]=0;
                     cursor->children[i] = nullptr;
                 }
                 cursor->children[cursor->size] = nullptr;
 
-                delete[] cursor->item;
+                delete[] cursor->key;
                 delete[] cursor->children;
                 delete cursor;
 
@@ -507,7 +507,7 @@ public:
 
                 //merge two leaf node
                 for(int i=0; i<rightsibling->size; i++){
-                    cursor->item[i+cursor->size]=rightsibling->item[i];
+                    cursor->key[i+cursor->size]=rightsibling->key[i];
                 }
                 //edit pointer
                 cursor->children[cursor->size] = nullptr;
@@ -515,15 +515,15 @@ public:
                 cursor->children[cursor->size] = rightsibling->children[rightsibling->size];
 
                 //parent property edit
-                Removepar(rightsibling, right-1, cursor->parent);
+                removeParent(rightsibling, right-1, cursor->parent);
 
                 for(int i=0; i<rightsibling->size;i++){
-                    rightsibling->item[i]=0;
+                    rightsibling->key[i]=0;
                     rightsibling->children[i] = nullptr;
                 }
                 rightsibling->children[rightsibling->size] = nullptr;
 
-                delete[] rightsibling->item;
+                delete[] rightsibling->key;
                 delete[] rightsibling->children;
                 delete rightsibling;
                 return;
@@ -536,29 +536,29 @@ public:
         }
     }
 
-    void Removepar(Node<T>* node, int index, Node<T>* par){
+    void removeParent(Node<T>* node, int index, Node<T>* par){
         Node<T>* remover = node;
         Node<T>* cursor = par;
-        T target = cursor->item[index];
+        T target = cursor->key[index];
 
         //if cursor is root, and there are no more data -> child node is to be root!
         if(cursor == this->root && cursor->size==1){//root case
             if(remover == cursor->children[0]){
-                delete[] remover->item;
+                delete[] remover->key;
                 delete[] remover->children;
                 delete remover;
                 this->root = cursor->children[1];
-                delete[] cursor->item;
+                delete[] cursor->key;
                 delete[] cursor->children;
                 delete cursor;
                 return;
             }
             if(remover == cursor->children[1]){
-                delete[] remover->item;
+                delete[] remover->key;
                 delete[] remover->children;
                 delete remover;
                 this->root = cursor->children[0];
-                delete[] cursor->item;
+                delete[] cursor->key;
                 delete[] cursor->children;
                 delete cursor;
                 return;
@@ -567,9 +567,9 @@ public:
 
         //remove data
         for(int i=index; i<cursor->size-1;i++){
-            cursor->item[i] = cursor->item[i+1];
+            cursor->key[i] = cursor->key[i+1];
         }
-        cursor->item[cursor->size-1] = 0;
+        cursor->key[cursor->size-1] = 0;
 
         //remove pointer
         int rem_index = -1;
@@ -591,7 +591,7 @@ public:
         if(cursor == this->root){
             return;
         }
-        if(cursor->size < degree/2){//underflow case
+        if(cursor->size < maxKey/2){//underflow case
 
             int sib_index =-1;
             for(int i=0; i<cursor->parent->size+1;i++){
@@ -605,20 +605,20 @@ public:
             if(left >= 0){// left_sibiling exists
                 Node<T>* leftsibling= cursor->parent->children[left];
 
-                if(leftsibling->size > degree/2){ //if data number is enough to use this node
+                if(leftsibling->size > maxKey/2){ //if data number is enough to use this node
                     T* temp = new T[cursor->size+1];
 
-                    //copy item
+                    //copy key
                     for(int i=0; i<cursor->size; i++){
-                        temp[i]=cursor->item[i];
+                        temp[i]=cursor->key[i];
                     }
 
                     //insert and rearrange at cursor
-                    item_insert(temp, cursor->parent->item[left],cursor->size);
+                    keyInsert(temp, cursor->parent->key[left],cursor->size);
                     for(int i=0; i<cursor->size+1; i++){
-                        cursor->item[i] = temp[i];
+                        cursor->key[i] = temp[i];
                     }
-                    cursor->parent->item[left] = leftsibling->item[leftsibling->size-1];
+                    cursor->parent->key[left] = leftsibling->key[leftsibling->size-1];
                     delete[] temp;
 
                     Node<T>** child_temp = new Node<T>*[cursor->size+2];
@@ -627,7 +627,7 @@ public:
                         child_temp[i]=cursor->children[i];
                     }
                     //insert and rearrange at child
-                    child_insert(child_temp,leftsibling->children[leftsibling->size],cursor->size,0);
+                    childrenInsert(child_temp,leftsibling->children[leftsibling->size],cursor->size,0);
 
                     for(int i=0; i<cursor->size+2; i++){
                         cursor->children[i] = child_temp[i];
@@ -645,19 +645,19 @@ public:
             if(right <= cursor->parent->size){// right_sibiling exists
                 Node<T>* rightsibling = cursor->parent->children[right];
 
-                if(rightsibling->size > degree/2){//if data number is enough to use this node
+                if(rightsibling->size > maxKey/2){//if data number is enough to use this node
                     T* temp = new T[cursor->size+1];
 
-                    //copy item
+                    //copy key
                     for(int i=0; i<cursor->size; i++){
-                        temp[i]=cursor->item[i];
+                        temp[i]=cursor->key[i];
                     }
                     //insert and rearrange at cursor
-                    item_insert(temp,cursor->parent->item[sib_index],cursor->size);
+                    keyInsert(temp,cursor->parent->key[sib_index],cursor->size);
                     for(int i=0; i<cursor->size+1; i++){
-                        cursor->item[i] = temp[i];
+                        cursor->key[i] = temp[i];
                     }
-                    cursor->parent->item[sib_index] = rightsibling->item[0];
+                    cursor->parent->key[sib_index] = rightsibling->key[0];
                     delete[] temp;
 
                     //insert and reaarange at child
@@ -680,10 +680,10 @@ public:
             if(left>=0){ // left_sibling exists
                 Node<T>* leftsibling = cursor->parent->children[left];
 
-                leftsibling->item[leftsibling->size] = cursor->parent->item[left];
+                leftsibling->key[leftsibling->size] = cursor->parent->key[left];
                 //merge two leaf node
                 for(int i=0; i<cursor->size; i++){
-                    leftsibling->item[leftsibling->size+i+1]=cursor->item[i];
+                    leftsibling->key[leftsibling->size+i+1]=cursor->key[i];
                 }
                 for(int i=0; i<cursor->size+1;i++){
                     leftsibling->children[leftsibling->size+i+1] = cursor->children[i];
@@ -694,17 +694,17 @@ public:
                 }
                 leftsibling->size = leftsibling->size+cursor->size+1;
                 //delete recursion
-                Removepar(cursor, left,cursor->parent);
+                removeParent(cursor, left,cursor->parent);
                 return;
 
             }
             if(right<=cursor->parent->size){ // right_sibiling exists
                 Node<T>* rightsibling = cursor->parent->children[right];
 
-                cursor->item[cursor->size] = cursor->parent->item[right-1];
+                cursor->key[cursor->size] = cursor->parent->key[right-1];
                 //merge two leaf node
                 for(int i=0; i<rightsibling->size; i++){
-                    cursor->item[cursor->size+1+i]=rightsibling->item[i];
+                    cursor->key[cursor->size+1+i]=rightsibling->key[i];
                 }
                 for(int i=0; i<rightsibling->size+1;i++){
                     cursor->children[cursor->size+i+1] = rightsibling->children[i];
@@ -716,7 +716,7 @@ public:
                 //edit pointer
                 rightsibling->size = rightsibling->size+cursor->size+1;
                 //parent property edit
-                Removepar(rightsibling, right-1,cursor->parent);
+                removeParent(rightsibling, right-1,cursor->parent);
                 return;
             }
         }
@@ -727,12 +727,12 @@ public:
 
     void clear(Node<T>* cursor){
         if(cursor != nullptr){
-            if(!cursor->is_leaf){
+            if(!cursor->isLeaf){
                 for(int i=0; i <= cursor->size; i++){
                     clear(cursor->children[i]);
                 }
             }
-            delete[] cursor->item;
+            delete[] cursor->key;
             delete[] cursor->children;
             delete cursor;
         }
@@ -744,11 +744,11 @@ public:
         // You must NOT edit this function.
         if (cursor != NULL) {
             for (int i = 0; i < cursor->size; ++i) {
-                std::cout << cursor->item[i] << " ";
+                std::cout << cursor->key[i] << " ";
             }
             std::cout << "\n";
 
-            if (!cursor->is_leaf) {
+            if (!cursor->isLeaf) {
                 for (int i = 0; i < cursor->size + 1; ++i) {
                     print(cursor->children[i]);
                 }
@@ -763,17 +763,17 @@ public:
         searchPtr = rootPtr;
 
         //size = currKeyNum
-        while (searchPtr->is_leaf == false){
+        while (searchPtr->isLeaf == false){
             //traverse through each visited node
             for (int i=0; i< searchPtr->size; i++){
                 //std::cout << "[SEARCHING INTERNAL NODE] Node Key: " << searchPtr->keys[i] << ", searchKey: " << searchKey << " \n";
-                if (searchKey < searchPtr->item[i]){
+                if (searchKey < searchPtr->key[i]){
                     //std::cout << "[INTERNAL NODE FOUND] < searchKey. Key: " << searchPtr->keys[i] << ", searchKey: " << searchKey << " \n";
                     searchPtr = searchPtr->children[i];
                     break;
                 }
 
-                if (searchKey == searchPtr->item[i]){
+                if (searchKey == searchPtr->key[i]){
                     //std::cout << "[INTERNAL NODE FOUND] = searchKey. Key: " << searchPtr->keys[i] << ", searchKey: " << searchKey << " \n";
                     //need to search for left and right node 
                     Node<float> * leftNode = searchPtr->children[i];
@@ -807,7 +807,7 @@ public:
 
     if(currNode != nullptr){
         for (int i=0; i< currNode->size; i++){
-            if (currNode->item[i] >= startKey && currNode->item[i] <= endKey){
+            if (currNode->key[i] >= startKey && currNode->key[i] <= endKey){
                 vec.push_back(currNode->address[i]); 
                 count ++; 
                 keepSearching = true;
@@ -821,7 +821,7 @@ public:
         if ( currNode->children[currNode->size] != nullptr){
             currNode = currNode->children[currNode->size];
             for (int i=0; i< currNode->size; i++){
-                if (currNode->item[i] >= startKey && currNode->item[i] <= endKey){
+                if (currNode->key[i] >= startKey && currNode->key[i] <= endKey){
                     vec.push_back(currNode->address[i]);
                     count ++; 
                 }else{
