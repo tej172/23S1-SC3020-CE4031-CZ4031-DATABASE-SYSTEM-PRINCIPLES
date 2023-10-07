@@ -14,7 +14,7 @@ int main(void) {
     Disk d = Disk(20, 400000);
 
     int key1 = 1;
-    int key2 = 4;
+    int key2 = 1;
     int key3 = 7;
     int key4 = 10;
     int key5 = 17;
@@ -49,7 +49,7 @@ int main(void) {
     BPlusTree *BPTree = new BPlusTree(3);
 
     BPTree->insert(address1, 1);
-	BPTree->insert(address2, 4);
+	BPTree->insert(address2, 1);
 	BPTree->insert(address3, 7);
 	BPTree->insert(address4, 10);
 	BPTree->insert(address5, 17);

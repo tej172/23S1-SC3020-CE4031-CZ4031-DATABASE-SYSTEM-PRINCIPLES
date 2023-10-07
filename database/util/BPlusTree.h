@@ -351,39 +351,39 @@ public:
         return nullptr;
   };
 
-//   Address * findSearchKey(float searchKey, int numIndexNodesAccessed){ //change the return to address once its set up
-//     Node * node = findCorrectNodeForKey(searchKey, this->root);
-//     if (node != nullptr){
-//     for (int i=0; i< node->currKeyNum; i++){
-//         if (node->keys[i] == searchKey){
-//                 std::cout << "[KEY FOUND] \n";
-//                 Address* addressPointer = &node->addressPtrs[i];
-//                 // numIndexNodesAccessed++;
-//                 return addressPointer;
-//             }
-//     }}
-    
-//     std::cout << "[KEY NOT FOUND] \n";
-//     return nullptr;
-//   }
-
-std::vector<Address*> findSearchKey(float searchKey, int& numIndexNodesAccessed) {
-    std::vector<Address*> addresses; // Create a vector to store the addresses
-    Node* node = findCorrectNodeForKey(searchKey, this->root);
-
-    if (node != nullptr) {
-        for (int i = 0; i < node->currKeyNum; i++) {
-            if (node->keys[i] == searchKey) {
+  Address * findSearchKey(float searchKey, int numIndexNodesAccessed){ //change the return to address once its set up
+    Node * node = findCorrectNodeForKey(searchKey, this->root);
+    if (node != nullptr){
+    for (int i=0; i< node->currKeyNum; i++){
+        if (node->keys[i] == searchKey){
                 std::cout << "[KEY FOUND] \n";
                 Address* addressPointer = &node->addressPtrs[i];
-                addresses.push_back(addressPointer); // Collect the address
                 numIndexNodesAccessed++;
+                return addressPointer;
             }
-        }
-    }
+    }}
+    
+    std::cout << "[KEY NOT FOUND] \n";
+    return nullptr;
+  }
 
-    return addresses; // Return the vector of addresses
-}
+// std::vector<Address*> findSearchKey(float searchKey, int& numIndexNodesAccessed) {
+//     std::vector<Address*> addresses; // Create a vector to store the addresses
+//     Node* node = findCorrectNodeForKey(searchKey, this->root);
+
+//     if (node != nullptr) {
+//         for (int i = 0; i < node->currKeyNum; i++) {
+//             if (node->keys[i] == searchKey) {
+//                 std::cout << "[KEY FOUND] \n";
+//                 Address* addressPointer = &node->addressPtrs[i];
+//                 addresses.push_back(addressPointer); // Collect the address
+//                 numIndexNodesAccessed++;
+//             }
+//         }
+//     }
+
+//     return addresses; // Return the vector of addresses
+// }
 
   void printTree(Node *displayNode){
     std::cout << "===============================\n";

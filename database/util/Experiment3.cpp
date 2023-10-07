@@ -135,6 +135,8 @@ int main() {
         // Insert "FG_PCT_home" into the B+ tree
         bPlusTree->insert(address, record.FG_PCT_home);
 
+    
+
         // Update statistics
         ++numRecords;
         totalRecordSize += recordSize;
@@ -167,45 +169,47 @@ int main() {
     cout << endl;
 
     // Experiment 3: Retrieve movies with "FG_PCT_home" equal to 0.5
+
+
+// std::vector<Address*> resultAddresses = bPlusTree->findSearchKey(searchKey, numIndexNodesAccessed);
+
+// // Print the addresses found
+// cout << "Addresses with FG_PCT_home equal to " << searchKey << ":" << endl;
+// for (Address* address : resultAddresses) {
+//     cout << "Block Number: " << address->blkNumber << ", Offset: " << address->offset << endl;
+// }
+
     float searchKey = 0.5f;
     int numIndexNodesAccessed = 0;
     int numDataBlocksAccessed = 0;
 
     // Start measuring the execution time
     auto startTime = chrono::high_resolution_clock::now();
-
-std::vector<Address*> resultAddresses = bPlusTree->findSearchKey(searchKey, numIndexNodesAccessed);
-
-// Print the addresses found
-cout << "Addresses with FG_PCT_home equal to " << searchKey << ":" << endl;
-for (Address* address : resultAddresses) {
-    cout << "Block Number: " << address->blkNumber << ", Offset: " << address->offset << endl;
-}
      
-// Address * findAddress1 = bPlusTree->findSearchKey(searchKey);
+    Address *resultAddresses = bPlusTree->findSearchKey(searchKey, numIndexNodesAccessed);
     // Stop measuring the execution time
-    // auto endTime = chrono::high_resolution_clock::now();
-    // auto duration = chrono::duration_cast<chrono::microseconds>(endTime - startTime);
+    auto endTime = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::microseconds>(endTime - startTime);
 
-    // // If the search was successful, retrieve the associated record
-    // if (resultAddress != nullptr) {
-    //     recordStruct* resultRecord = static_cast<recordStruct*>(disk.loadDataFromDisk(*resultAddress, recordSize));
+    // If the search was successful, retrieve the associated record
+    if (resultAddresses != nullptr) {
+        recordStruct* resultRecord = static_cast<recordStruct*>(disk.loadDataFromDisk(*resultAddresses, recordSize));
 
-    //     // Calculate the running time in milliseconds
-    //     double runningTime = static_cast<double>(duration.count()) / 1000.0;
+        // Calculate the running time in milliseconds
+        double runningTime = static_cast<double>(duration.count()) / 1000.0;
 
-    //     // Report the results
-    //     cout << "\nExperiment 3 Statistics (B+ Tree Retrieval):" << endl;
-    //     cout << "Number of Index Nodes Accessed: " << numIndexNodesAccessed << endl;
-    //     cout << "Number of Data Blocks Accessed: " << numDataBlocksAccessed << endl;
-    //     cout << "Average FG3_PCT_home of Retrieved Records: " << resultRecord->FG3_PCT_home << endl;
-    //     cout << "Running Time of B+ Tree Retrieval (ms): " << runningTime << endl;
+        // Report the results
+        cout << "\nExperiment 3 Statistics (B+ Tree Retrieval):" << endl;
+        cout << "Number of Index Nodes Accessed: " << numIndexNodesAccessed << endl;
+        cout << "Number of Data Blocks Accessed: " << numDataBlocksAccessed << endl;
+        cout << "Average FG3_PCT_home of Retrieved Records: " << resultRecord->FG3_PCT_home << endl;
+        cout << "Running Time of B+ Tree Retrieval (ms): " << runningTime << endl;
 
-    //     // Clean up
-    //     delete resultRecord;
-    // } else {
-    //     cout << "\nNo records found with FG_PCT_home equal to " << searchKey << endl;
-    // }
+        // Clean up
+        delete resultRecord;
+    } else {
+        cout << "\nNo records found with FG_PCT_home equal to " << searchKey << endl;
+    }
 }
 
 
