@@ -893,6 +893,13 @@ public:
                         {
                             //std::cout << "m:" << floatVector[m] << " ";
                             remove(floatVector[m]);
+                            // remove(0.25);
+                            // remove(0.257);
+                            // remove(0.266);
+                            // remove(0.269);
+                            // remove(0.274);
+                            // remove(0.275);
+                            // remove(0.277);
                         }
                         return delCount;
                     }
@@ -911,9 +918,9 @@ public:
 
         for (int i = 0; i < floatVector.size(); i++)
         {
-            std::cout << "i:" << floatVector[i] << " ";
+            //std::cout << "i:" << floatVector[i] << " ";
 
-            // remove(floatVector[i]);
+            remove(floatVector[i]);
         }
         return delCount;
     }
