@@ -88,10 +88,20 @@ int main(){
 		BPtree.insert(record.FG_PCT_home, address);
 	}
 	std::cout << "the smallest record is: " << smallestRecord << "\n";
-	vector<Address> res = BPtree.findKeyRange(0, 0.5);
+	vector<Address> res = BPtree.findKeyRange(0, 0.3);
 	std::cout << "the record count is: " << res.size();
 
+	
 
+	Node<float> * val_temp = BPtree.findFirstMostNode();
+	std::cout << "\nLEFTMOST value:: " << val_temp->key[0];
+
+	int numOfDeleted =  BPtree.delKeyRange(0, 0.3);
+
+	std::cout << "\n No. of deleted records are: " << numOfDeleted << "\n";
+
+	vector<Address> resAfter = BPtree.findKeyRange(0, 0.3);
+	std::cout << "AFTER DELETE ::: the record count is: " << resAfter.size();
 
 	return 0;
 }

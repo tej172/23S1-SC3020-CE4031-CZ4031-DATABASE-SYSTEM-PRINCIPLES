@@ -807,7 +807,97 @@ public:
         }
     }
 
-  Node<float> * findCorrectNodeForKey(float searchKey, Node<T>* rootPtr = nullptr){
+    Node<float> * findFirstMostNode()
+    {
+        Node<float> *currNode = getroot();
+
+        // std::cout << currNode->item[0];
+
+        while (currNode->isLeaf == false)
+        {
+            currNode = currNode->children[0];
+        }
+
+        std::cout << "LEFTMOST VALUE::  " << currNode->key[0] << "\n";
+        //return currNode->item[0];
+        return currNode;
+
+    }
+
+    int delKeyRange(float startKey, float endKey){
+
+        std::vector<Address> delValues;
+
+        delValues = findKeyRange(startKey, endKey);
+
+        Node<float> *currNode = findCorrectNodeForKey(startKey, getroot());
+        bool keepDeleting = true;
+        int delCount=0;
+
+        std::cout << "\nCOUNT 1 IS: " << delCount << "\n";
+
+        //for (int i=0; i< delValues.size(); i++){
+            //remove(delValues[i]);
+            //std::cout << "VALUE IS: " << delValues.size();
+        
+        if (currNode != nullptr)
+        {
+            for (int j = 0; j < currNode->size; j++)
+            {
+                if (currNode->key[j] >= startKey && currNode->key[j] <= endKey)
+                {
+                    remove(currNode->key[j]);
+                    delCount++;
+                    keepDeleting = true;
+                }
+                else
+                {
+                    keepDeleting = false;
+                }
+            }
+        }
+        std::cout << "\nCOUNT 2 IS: " << delCount << "\n";
+
+        while (keepDeleting == true)
+        {
+            if (currNode->children[currNode->size] != nullptr){
+                currNode = currNode->children[currNode->size];
+                for (int i = 0; i < currNode->size; i++)
+                {
+                    if (currNode->key[i] >= startKey && currNode->key[i] <= endKey)
+                    {
+                        remove(currNode->key[i]);
+
+                        delCount++;
+                    }
+                    else
+                    {
+                        keepDeleting = false;
+                        return delCount;
+                    }
+                }
+            }
+            /* code */
+            else{
+                keepDeleting = false;
+            }
+        }
+        
+        //}
+
+        std::cout << "\nkeepDeleting(BOOL) IS:: "<< keepDeleting << "\n";
+        std::cout << "FINAL COUNT IS: " << delCount << "\n";
+
+        return delCount;
+        
+
+
+
+
+    }
+
+    Node<float> *findCorrectNodeForKey(float searchKey, Node<T> *rootPtr = nullptr)
+    {
         Node<float> * searchPtr;
 
         //std::cout << "[STARTING SEARCH] searchKey: " << searchKey << " \n";
@@ -849,7 +939,8 @@ public:
         }
 
         return searchPtr;
-  };
+    };
+
   std::vector<Address> findKeyRange(float startKey, float endKey){
     Node<float> * currNode = findCorrectNodeForKey(startKey, getroot());
     bool keepSearching = true;
@@ -884,6 +975,13 @@ public:
             keepSearching= false;
         }
     }
+
+    // // Print the contents of vec
+    // for (const Address &address : vec)
+    // {
+    //     std::cout << address << std::endl;
+    // }
+
     return vec;
   }
 
