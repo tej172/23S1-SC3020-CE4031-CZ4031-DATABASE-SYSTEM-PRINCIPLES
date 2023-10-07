@@ -797,18 +797,8 @@ public:
             }  
         }
 
-        for (int i=0; i< searchPtr->size; i++){
-            if (searchPtr->item[i] == searchKey){
-                //std::cout << "[KEY FOUND] \n";
-                return searchPtr;
-            }
-        }
-
-        //std::cout << "[KEY NOT FOUND] \n";
-        return nullptr;
+        return searchPtr;
   };
-
-
   std::vector<Address> findKeyRange(float startKey, float endKey){
     Node<float> * currNode = findCorrectNodeForKey(startKey, getroot());
     bool keepSearching = true;

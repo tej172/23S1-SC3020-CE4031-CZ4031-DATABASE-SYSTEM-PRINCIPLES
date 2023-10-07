@@ -88,17 +88,10 @@ int main(){
 		BPtree.insert(record.FG_PCT_home, address);
 	}
 	std::cout << "the smallest record is: " << smallestRecord << "\n";
-	vector<Address> res = BPtree.findKeyRange(0.5, 0.5);
+	vector<Address> res = BPtree.findKeyRange(0, 0.5);
 	std::cout << "the record count is: " << res.size();
 
-	for (int i=0; i< res.size(); i++){
-		void* data = disk.loadDataFromDisk(res[i], sizeof(recordStruct));
-		recordStruct* loadedRecord = static_cast<recordStruct*>(data);
-		if (loadedRecord->FG_PCT_home != 0.5){
-			std::cout << "ERROR";
-			std::cout << "Data from the record: " << loadedRecord->FG_PCT_home;
-		}
-	}
+
 
 	return 0;
 }
