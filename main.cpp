@@ -19,7 +19,7 @@ using namespace std;
 int main(){
 	Disk disk = Disk(400, 300000000);
 
-	BPlusTree<float> BPtree = BPlusTree<float>(34);
+	BPlusTree<float> BPtree = BPlusTree<float>(11); // change n-val to 34 to get the deletion to work
 	int countRecord = 0;
 	float smallestRecord = 10000;
     ifstream inputFile("Data/games.txt");
@@ -91,17 +91,24 @@ int main(){
 	vector<Address> res = BPtree.findKeyRange(0, 0.35);
 	std::cout << "the record count to delete is: " << res.size();
 
+	BPtree.findRootNodeValue();
+
+	int treeHeight = BPtree.findHeight();
+	std::cout << "\ntree height is:: " << treeHeight << "\n"; // Get the height of the tree.
 	
 
+
+	int numNodes = BPtree.countNodes();
+	std::cout << "number of nodes are:: " << numNodes << "\n"; // Get the number of nodes in the tree.
 	Node<float> * val_temp = BPtree.findFirstMostNode();
-	std::cout << "\nLEFTMOST value:: " << val_temp->key[0];
+	// std::cout << "\nLEFTMOST value:: " << val_temp->key[0];
 
-	int numOfDeleted =  BPtree.delKeyRange(0, 0.35);
+	// int numOfDeleted =  BPtree.delKeyRange(0, 0.35);
 
-	std::cout << "\n No. of deleted records are: " << numOfDeleted << "\n";
+	// std::cout << "\n No. of deleted records are: " << numOfDeleted << "\n";
 
-	vector<Address> resAfter = BPtree.findKeyRange(0, 0.35);
-	std::cout << "AFTER DELETE ::: the record count is: " << resAfter.size();
+	// vector<Address> resAfter = BPtree.findKeyRange(0, 0.35);
+	// std::cout << "AFTER DELETE ::: the record count is: " << resAfter.size();
 
 	return 0;
 }

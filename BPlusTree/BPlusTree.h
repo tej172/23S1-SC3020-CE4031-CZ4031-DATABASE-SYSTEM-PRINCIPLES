@@ -807,18 +807,87 @@ public:
         }
     }
 
+    ///
+    /// helper_Exp5
+
+    ///
+    /// helper_Exp5
+    // Helper function to count num of nodes using recursion
+
+    void findRootNodeValue(){
+        Node<float> *currNode = getroot();
+        if (currNode)
+        {
+            std::cout << "\n[Values in the root node: ";
+            for (int i = 0; i < currNode->size; i++)
+            {
+                std::cout << currNode->key[i] << " ";
+            }
+            std::cout << "]"<< std::endl;
+        }
+        else
+        {
+            std::cout << "::[Root node is empty.]::" << std::endl;
+        }
+    }
+
+    int countNodes()
+    {
+        Node<float> *currNode = getroot();
+        return countNodesRecursive(currNode);
+    }
+    int countNodesRecursive(Node<T> *currNode)
+    {
+        if (!currNode)
+        {
+            return 0;
+        }
+        int count = 1; // Count current node
+        if (!currNode->isLeaf)
+        {
+            for (int i = 0; i < currNode->size + 1; i++)
+            {
+                count += countNodesRecursive(currNode->children[i]);
+            }
+        }
+        return count;
+    }
+
+
+    int findHeight(){
+        Node<float> *currNode = getroot();
+        return findHeightRecursive(currNode);
+    }
+    int findHeightRecursive(Node<T> *currNode)
+    {
+        if (!currNode)
+        {
+            return 0;
+        }
+        int height = 0;
+        if (!currNode->isLeaf)
+        {
+            height = 1 + findHeightRecursive(currNode->children[0]);
+        }
+        return height;
+    }
+
+
     Node<float> * findFirstMostNode()
     {
         Node<float> *currNode = getroot();
 
         // std::cout << currNode->item[0];
+        int countHeight = 0;
 
         while (currNode->isLeaf == false)
         {
+            countHeight++;
             currNode = currNode->children[0];
         }
 
         std::cout << "\nLEFTMOST VALUE::  " << currNode->key[0] << "\n";
+        std::cout << "\nTREEE HEIGHTT::  " << countHeight << "\n";
         //return currNode->item[0];
         return currNode;
 
