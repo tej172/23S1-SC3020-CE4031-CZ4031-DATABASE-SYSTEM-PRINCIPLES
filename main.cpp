@@ -32,9 +32,11 @@ int main(){
 		// Split the line into fields
 		char* token = strtok(const_cast<char*>(line.c_str()), "\t");
 		recordStruct record;
+		bool firstLine = true;
 		
 		// Parse and store data in the recordStruct
 		for (size_t i = 0; i < recordStruct::NUM_FIELDS && token; ++i) {
+			if (firstLine) continue;
 			switch (i) {
 			
 				case 0: // GAME_DATE_EST
@@ -69,8 +71,7 @@ int main(){
 			}
 			token = strtok(nullptr, "\t");
 		}
-		if (record.FG_PCT_home >= 0.6 && record.FG_PCT_home <= 1){
-			countRecord++;}
+		std::cout << record.FG_PCT_home << "\n";
 		Address address = disk.saveDataToDisk(&record, sizeof(recordStruct));
 
 		BPtree.insert(record.FG_PCT_home, address);
