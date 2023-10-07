@@ -36,7 +36,10 @@ int main(){
 		
 		// Parse and store data in the recordStruct
 		for (size_t i = 0; i < recordStruct::NUM_FIELDS && token; ++i) {
-			if (firstLine) continue;
+			if (firstLine){
+				firstLine = false;
+				continue;
+			}
 			switch (i) {
 			
 				case 0: // GAME_DATE_EST
