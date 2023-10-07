@@ -33,12 +33,18 @@ public:
         address = new Address[maxKey];
         this->parent = nullptr;
     }
+        // Function to count the number of nodes in the B+ tree
+
 };
 
 template <typename T>
 class BPlusTree {
     Node<T>* root;
     std::size_t maxKey;
+
+private:
+
+    int accessedNodesCount=0;
 
 public:
     BPlusTree(std::size_t _maxKey) {// Constructor
@@ -88,21 +94,6 @@ public:
                 break;
             }
         }
-        return index;
-    }
-    int keyInsertIndex(T* arr, T data, int len){
-        int index = 0;
-        for(int i=0; i<len; i++){
-            if(data < arr[i]){
-                index = i;
-                break;
-            }
-            if(i==len-1){
-                index = len;
-                break;
-            }
-        }
-
         return index;
     }
     T* keyInsert(T* arr, T data, int len){
@@ -394,10 +385,8 @@ public:
         //remove data
         for(int i=del_index; i<cursor->size-1;i++){
             cursor->key[i] = cursor->key[i+1];
-            cursor->address[i] = cursor->address[i+1];
         }
         cursor->key[cursor->size-1] = 0;
-        cursor->address[cursor->size-1] = Address();
         cursor->size--;
 
         //if cursor is root, and there are no more data -> clean!
@@ -421,29 +410,16 @@ public:
 
                 if(leftsibling->size > maxKey/2){ //if data number is enough to use this node
                     T* temp = new T[cursor->size+1];
-                    Address * temp_address = new Address[cursor->size+1];
 
                     //copy key
                     for(int i=0; i<cursor->size; i++){
                         temp[i]=cursor->key[i];
-                        temp_address[i] = cursor->address[i];
                     }
 
                     //insert and rearrange
-                    int index = keyInsertIndex(temp,leftsibling->key[leftsibling->size -1],cursor->size);
-                    
-                    for(int i = cursor->size; i > index; i--){
-                        temp[i] = temp[i-1];
-                        temp_address[i] = temp_address[i-1];
-                    }
-
-                    temp[index] = leftsibling->key[leftsibling->size -1];
-                    temp_address[index] =leftsibling->address[leftsibling->size -1];
-                    
-                    
+                    keyInsert(temp,leftsibling->key[leftsibling->size -1],cursor->size);
                     for(int i=0; i<cursor->size+1; i++){
                         cursor->key[i] = temp[i];
-                        cursor->address[i] = temp_address[i];
                     }
                     cursor->size++;
                     delete[] temp;
@@ -454,13 +430,13 @@ public:
 
                     //sibling property edit
                     leftsibling->key[leftsibling->size-1] = 0;
-                    leftsibling->address[leftsibling->size-1] = Address();
                     leftsibling->size--;
                     leftsibling->children[leftsibling->size] = leftsibling->children[leftsibling->size+1]; //cursor
                     leftsibling->children[leftsibling->size+1]= nullptr;
 
                     //parent property edit
                     cursor->parent->key[left] = cursor->key[0];
+
                     return;
                 }
             }
@@ -469,31 +445,18 @@ public:
 
                 if(rightsibling->size >maxKey/2){//if data number is enough to use this node
                     T* temp = new T[cursor->size+1];
-                    Address * temp_address = new Address[cursor->size+1];
 
                     //copy key
                     for(int i=0; i<cursor->size; i++){
                         temp[i]=cursor->key[i];
-                        temp_address[i] = cursor->address[i];
                     }
                     //insert and rearrange
-                    int index = keyInsertIndex(temp,rightsibling->key[0],cursor->size);
-                    for(int i = cursor->size; i > index; i--){
-                        temp[i] = temp[i-1];
-                        temp_address[i] = temp_address[i-1];
-                    }
-
-                    temp[index] = rightsibling->key[0];
-                    temp_address[index] = rightsibling->address[0];
-
-
+                    keyInsert(temp,rightsibling->key[0],cursor->size);
                     for(int i=0; i<cursor->size+1; i++){
                         cursor->key[i] = temp[i];
-                        cursor->address[i] = temp_address[i];
                     }
                     cursor->size++;
                     delete[] temp;
-                    delete [] temp_address;
 
                     //pointer edit
                     cursor->children[cursor->size] = cursor->children[cursor->size-1];
@@ -502,10 +465,8 @@ public:
                     //sibling property edit
                     for(int i=0; i<rightsibling->size-1;i++){
                         rightsibling->key[i] = rightsibling->key[i+1];
-                        rightsibling->address[i] = rightsibling->address[i+1];
                     }
                     rightsibling->key[rightsibling->size-1] = 0;
-                    rightsibling->address[rightsibling->size-1] = Address();
                     rightsibling->size--;
                     rightsibling->children[rightsibling->size] = rightsibling->children[rightsibling->size+1]; //cursor
                     rightsibling->children[rightsibling->size+1]= nullptr;
@@ -526,7 +487,6 @@ public:
                 //merge two leaf node
                 for(int i=0; i<cursor->size; i++){
                     leftsibling->key[leftsibling->size+i]=cursor->key[i];
-                    leftsibling->address[leftsibling->size+i]=cursor->address[i];
                 }
                 //edit pointer
                 leftsibling->children[leftsibling->size] = nullptr;
@@ -537,14 +497,12 @@ public:
                 removeParent(cursor, left, cursor->parent);
                 for(int i=0; i<cursor->size;i++){
                     cursor->key[i]=0;
-                    cursor->address[i] = Address();
                     cursor->children[i] = nullptr;
                 }
                 cursor->children[cursor->size] = nullptr;
 
                 delete[] cursor->key;
                 delete[] cursor->children;
-                delete[] cursor->address;
                 delete cursor;
 
                 return;
@@ -556,7 +514,6 @@ public:
                 //merge two leaf node
                 for(int i=0; i<rightsibling->size; i++){
                     cursor->key[i+cursor->size]=rightsibling->key[i];
-                    cursor->address[i+cursor->size]=rightsibling->address[i];
                 }
                 //edit pointer
                 cursor->children[cursor->size] = nullptr;
@@ -568,14 +525,12 @@ public:
 
                 for(int i=0; i<rightsibling->size;i++){
                     rightsibling->key[i]=0;
-                    rightsibling->address[i] = Address();
                     rightsibling->children[i] = nullptr;
                 }
                 rightsibling->children[rightsibling->size] = nullptr;
 
                 delete[] rightsibling->key;
                 delete[] rightsibling->children;
-                delete[] rightsibling->address;
                 delete rightsibling;
                 return;
 
@@ -586,6 +541,7 @@ public:
             return;
         }
     }
+
     void removeParent(Node<T>* node, int index, Node<T>* par){
         Node<T>* remover = node;
         Node<T>* cursor = par;
@@ -784,7 +740,6 @@ public:
             }
             delete[] cursor->key;
             delete[] cursor->children;
-            delete[] cursor->address;
             delete cursor;
         }
     }
@@ -806,7 +761,6 @@ public:
             }
         }
     }
-
     Node<float> * findFirstMostNode()
     {
         Node<float> *currNode = getroot();
@@ -818,7 +772,7 @@ public:
             currNode = currNode->children[0];
         }
 
-        std::cout << "\nLEFTMOST VALUE::  " << currNode->key[0] << "\n";
+        // std::cout << "\nLEFTMOST VALUE::  " << currNode->key[0] << "\n";
         //return currNode->item[0];
         return currNode;
 
@@ -925,8 +879,7 @@ public:
         return delCount;
     }
 
-    Node<float> *findCorrectNodeForKey(float searchKey, Node<T> *rootPtr = nullptr)
-    {
+  Node<float> * findCorrectNodeForKey(float searchKey, Node<T>* rootPtr = nullptr){
         Node<float> * searchPtr;
 
         //std::cout << "[STARTING SEARCH] searchKey: " << searchKey << " \n";
@@ -936,6 +889,9 @@ public:
         while (searchPtr->isLeaf == false){
             //traverse through each visited node
             for (int i=0; i< searchPtr->size; i++){
+                accessedNodesCount++;
+                // std::cout << "accessedNodesCount: " << accessedNodesCount << " \n";
+                // std::cout << "accessedNodesCount " << accessedNodesCount  << " \n";
                 //std::cout << "[SEARCHING INTERNAL NODE] Node Key: " << searchPtr->keys[i] << ", searchKey: " << searchKey << " \n";
                 if (searchKey < searchPtr->key[i]){
                     //std::cout << "[INTERNAL NODE FOUND] < searchKey. Key: " << searchPtr->keys[i] << ", searchKey: " << searchKey << " \n";
@@ -966,10 +922,9 @@ public:
                 }
             }  
         }
-
+    
         return searchPtr;
-    };
-
+  };
   std::vector<Address> findKeyRange(float startKey, float endKey){
     Node<float> * currNode = findCorrectNodeForKey(startKey, getroot());
     bool keepSearching = true;
@@ -1004,14 +959,41 @@ public:
             keepSearching= false;
         }
     }
-
-    // // Print the contents of vec
-    // for (const Address &address : vec)
-    // {
-    //     std::cout << address << std::endl;
-    // }
-
     return vec;
   }
+    int countNodes(Node<T>* node) {
+        if (node == nullptr) {
+            return 0;
+        }
+        int count = 1;
+        for (int i = 0; i <= node->size; i++) {
+            count += countNodes(node->children[i]);
+        }
+        return count;
+    }
 
+    // Function to count the number of levels in the B+ tree
+    int countLevels(Node<T>* node) {
+        if (node == nullptr) {
+            return 0;
+        }
+        int maxChildLevels = 0;
+        for (int i = 0; i <= node->size; i++) {
+            int childLevels = countLevels(node->children[i]);
+            if (childLevels > maxChildLevels) {
+                maxChildLevels = childLevels;
+            }
+        }
+        return 1 + maxChildLevels;
+    }
+
+    int getN(){
+        return maxKey;
+    }
+    BPlusTree(int n) : root(nullptr), maxKey(n), accessedNodesCount(0) {
+   
+    }
+    int getNumAccessedNodes() const {
+        return accessedNodesCount;
+    }
 };
