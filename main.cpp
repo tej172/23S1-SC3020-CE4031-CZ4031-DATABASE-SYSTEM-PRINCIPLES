@@ -7,8 +7,9 @@
 #include "util/Address.h"
 #include "util/recordStruct.h"
 #include "Disk/Disk.h"
-#include "../Disk/Disk.cpp"
-#include "BPlustTree/BPlusTree.h" // Include the B+ tree header
+#include "Disk/Disk.cpp"
+#include "BPlusTree/BPlusTree.h" // Include the B+ tree header
+#include <chrono> // Include the chrono library
 
 using namespace std;
 
@@ -53,14 +54,14 @@ int main() {
     // Initialize the Disk object with your desired block and disk size
     Disk disk(400, 300000000);
 
-    ifstream inputFile("../src/games.txt");
+    ifstream inputFile("Data/games.txt");
     if (!inputFile.is_open()) {
         cerr << "Error: Unable to open input file." << endl;
         return 1;
     }
 
     // Create a B+ tree for Experiment 2
-    BPlusTree<int> bPlusTree(6); 
+    BPlusTree<float> BPtree = BPlusTree<float>(6);
 
     // Read and process each line from the input file
     string line;
@@ -126,7 +127,7 @@ int main() {
 
         // Insert "FG_PCT_home" into the B+ tree
         // bPlusTree.insert(address, record.FG_PCT_home);
-		bPlusTree.insert(record.FG_PCT_home);
+		BPtree.insert(record.FG_PCT_home, address);
         // Update statistics
         ++numRecords;
         totalRecordSize += recordSize;
@@ -147,16 +148,75 @@ int main() {
 if (numRecords > 0) {
     // Print B+ tree statistics
     cout << "Experiment 2 Statistics (B+ Tree):" << endl;
-    cout << "Parameter 'n' of the B+ Tree: " << bPlusTree.getN() << endl;
-    cout << "Number of Nodes in the B+ Tree: " << bPlusTree.getNumNodes() << endl;
-    cout << "Number of Levels in the B+ Tree: " << bPlusTree.getNumLevels() << endl;
+    // cout << "Parameter 'n' of the B+ Tree: " << bPlusTree.getN() << endl;
+    // cout << "Number of Nodes in the B+ Tree: " << bPlusTree.getNumNodes() << endl;
+    // cout << "Number of Levels in the B+ Tree: " << bPlusTree.getNumLevels() << endl;
 
     cout << "Content of the Root Node (only keys): ";
-    bPlusTree.printRoot();
+    // bPlusTree.printRoot();
     cout << endl;
 } else {
     cout << "No records have been inserted into the B+ tree." << endl;
 }
 
+
+
+vector<Address> res = BPtree.findKeyRange(0.5, 0.5);
+	std::cout << "the record count is: " << res.size();
+
+	for (int i=0; i< res.size(); i++){
+		void* data = disk.loadDataFromDisk(res[i], sizeof(recordStruct));
+		recordStruct* loadedRecord = static_cast<recordStruct*>(data);
+		if (loadedRecord->FG_PCT_home == 0.5){
+			std::cout << "True";
+			std::cout << "Data from the record: " << loadedRecord->FG_PCT_home;
+		}
+	}
+
+	return 0;
+    // Experiment 3: Retrieve movies with "FG_PCT_home" equal to 0.5
+
+
+// std::vector<Address*> resultAddresses = bPlusTree->findSearchKey(searchKey, numIndexNodesAccessed);
+
+// // Print the addresses found
+// cout << "Addresses with FG_PCT_home equal to " << searchKey << ":" << endl;
+// for (Address* address : resultAddresses) {
+//     cout << "Block Number: " << address->blkNumber << ", Offset: " << address->offset << endl;
+// }
+
+    // float searchKey = 0.5f;
+    // int numIndexNodesAccessed = 0;
+    // int numDataBlocksAccessed = 0;
+
+    // Start measuring the execution time
+    // auto startTime = chrono::high_resolution_clock::now();
+     
+    // int resultAddresses = bPlusTree.findKeyRange(searchKey,searchKey );
+
+    // cout << "resultAddresses: " << resultAddresses << endl;
+    // Stop measuring the execution time
+    // auto endTime = chrono::high_resolution_clock::now();
+    // auto duration = chrono::duration_cast<chrono::microseconds>(endTime - startTime);
+
+    // // If the search was successful, retrieve the associated record
+    // if (resultAddresses != nullptr) {
+    //     recordStruct* resultRecord = static_cast<recordStruct*>(disk.loadDataFromDisk(*resultAddresses, recordSize));
+
+    //     // Calculate the running time in milliseconds
+    //     double runningTime = static_cast<double>(duration.count()) / 1000.0;
+
+    //     // Report the results
+    //     cout << "\nExperiment 3 Statistics (B+ Tree Retrieval):" << endl;
+    //     cout << "Number of Index Nodes Accessed: " << numIndexNodesAccessed << endl;
+    //     // cout << "Number of Data Blocks Accessed: " << numDataBlocksAccessed << endl;
+    //     cout << "Average FG3_PCT_home of Retrieved Records: " << resultRecord->FG3_PCT_home << endl;
+    //     cout << "Running Time of B+ Tree Retrieval (ms): " << runningTime << endl;
+
+    //     // Clean up
+    //     delete resultRecord;
+    // } else {
+    //     cout << "\nNo records found with FG_PCT_home equal to " << searchKey << endl;
+    // }
   
 }
