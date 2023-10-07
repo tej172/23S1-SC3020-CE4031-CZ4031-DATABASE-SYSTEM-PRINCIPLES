@@ -89,7 +89,7 @@ int main(){
 	}
 	std::cout << "the smallest record is: " << smallestRecord << "\n";
 	vector<Address> res = BPtree.findKeyRange(0, 0.3);
-	std::cout << "the record count is: " << res.size();
+	std::cout << "the record count to delete is: " << res.size();
 
 	
 
