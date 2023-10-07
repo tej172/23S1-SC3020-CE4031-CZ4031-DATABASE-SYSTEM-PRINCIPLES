@@ -90,6 +90,21 @@ public:
         }
         return index;
     }
+    int keyInsertIndex(T* arr, T data, int len){
+        int index = 0;
+        for(int i=0; i<len; i++){
+            if(data < arr[i]){
+                index = i;
+                break;
+            }
+            if(i==len-1){
+                index = len;
+                break;
+            }
+        }
+
+        return index;
+    }
     T* keyInsert(T* arr, T data, int len){
         int index = 0;
         for(int i=0; i<len; i++){
@@ -379,8 +394,10 @@ public:
         //remove data
         for(int i=del_index; i<cursor->size-1;i++){
             cursor->key[i] = cursor->key[i+1];
+            cursor->address[i] = cursor->address[i+1];
         }
         cursor->key[cursor->size-1] = 0;
+        cursor->address[cursor->size-1] = Address();
         cursor->size--;
 
         //if cursor is root, and there are no more data -> clean!
@@ -404,16 +421,29 @@ public:
 
                 if(leftsibling->size > maxKey/2){ //if data number is enough to use this node
                     T* temp = new T[cursor->size+1];
+                    Address * temp_address = new Address[cursor->size+1];
 
                     //copy key
                     for(int i=0; i<cursor->size; i++){
                         temp[i]=cursor->key[i];
+                        temp_address[i] = cursor->address[i];
                     }
 
                     //insert and rearrange
-                    keyInsert(temp,leftsibling->key[leftsibling->size -1],cursor->size);
+                    int index = keyInsertIndex(temp,leftsibling->key[leftsibling->size -1],cursor->size);
+                    
+                    for(int i = cursor->size; i > index; i--){
+                        temp[i] = temp[i-1];
+                        temp_address[i] = temp_address[i-1];
+                    }
+
+                    temp[index] = leftsibling->key[leftsibling->size -1];
+                    temp_address[index] =leftsibling->address[leftsibling->size -1];
+                    
+                    
                     for(int i=0; i<cursor->size+1; i++){
                         cursor->key[i] = temp[i];
+                        cursor->address[i] = temp_address[i];
                     }
                     cursor->size++;
                     delete[] temp;
@@ -424,13 +454,13 @@ public:
 
                     //sibling property edit
                     leftsibling->key[leftsibling->size-1] = 0;
+                    leftsibling->address[leftsibling->size-1] = Address();
                     leftsibling->size--;
                     leftsibling->children[leftsibling->size] = leftsibling->children[leftsibling->size+1]; //cursor
                     leftsibling->children[leftsibling->size+1]= nullptr;
 
                     //parent property edit
                     cursor->parent->key[left] = cursor->key[0];
-
                     return;
                 }
             }
@@ -439,18 +469,31 @@ public:
 
                 if(rightsibling->size >maxKey/2){//if data number is enough to use this node
                     T* temp = new T[cursor->size+1];
+                    Address * temp_address = new Address[cursor->size+1];
 
                     //copy key
                     for(int i=0; i<cursor->size; i++){
                         temp[i]=cursor->key[i];
+                        temp_address[i] = cursor->address[i];
                     }
                     //insert and rearrange
-                    keyInsert(temp,rightsibling->key[0],cursor->size);
+                    int index = keyInsertIndex(temp,rightsibling->key[0],cursor->size);
+                    for(int i = cursor->size; i > index; i--){
+                        temp[i] = temp[i-1];
+                        temp_address[i] = temp_address[i-1];
+                    }
+
+                    temp[index] = rightsibling->key[0];
+                    temp_address[index] = rightsibling->address[0];
+
+
                     for(int i=0; i<cursor->size+1; i++){
                         cursor->key[i] = temp[i];
+                        cursor->address[i] = temp_address[i];
                     }
                     cursor->size++;
                     delete[] temp;
+                    delete [] temp_address;
 
                     //pointer edit
                     cursor->children[cursor->size] = cursor->children[cursor->size-1];
@@ -459,8 +502,10 @@ public:
                     //sibling property edit
                     for(int i=0; i<rightsibling->size-1;i++){
                         rightsibling->key[i] = rightsibling->key[i+1];
+                        rightsibling->address[i] = rightsibling->address[i+1];
                     }
                     rightsibling->key[rightsibling->size-1] = 0;
+                    rightsibling->address[rightsibling->size-1] = Address();
                     rightsibling->size--;
                     rightsibling->children[rightsibling->size] = rightsibling->children[rightsibling->size+1]; //cursor
                     rightsibling->children[rightsibling->size+1]= nullptr;
@@ -481,6 +526,7 @@ public:
                 //merge two leaf node
                 for(int i=0; i<cursor->size; i++){
                     leftsibling->key[leftsibling->size+i]=cursor->key[i];
+                    leftsibling->address[leftsibling->size+i]=cursor->address[i];
                 }
                 //edit pointer
                 leftsibling->children[leftsibling->size] = nullptr;
@@ -491,12 +537,14 @@ public:
                 removeParent(cursor, left, cursor->parent);
                 for(int i=0; i<cursor->size;i++){
                     cursor->key[i]=0;
+                    cursor->address[i] = Address();
                     cursor->children[i] = nullptr;
                 }
                 cursor->children[cursor->size] = nullptr;
 
                 delete[] cursor->key;
                 delete[] cursor->children;
+                delete[] cursor->address;
                 delete cursor;
 
                 return;
@@ -508,6 +556,7 @@ public:
                 //merge two leaf node
                 for(int i=0; i<rightsibling->size; i++){
                     cursor->key[i+cursor->size]=rightsibling->key[i];
+                    cursor->address[i+cursor->size]=rightsibling->address[i];
                 }
                 //edit pointer
                 cursor->children[cursor->size] = nullptr;
@@ -519,12 +568,14 @@ public:
 
                 for(int i=0; i<rightsibling->size;i++){
                     rightsibling->key[i]=0;
+                    rightsibling->address[i] = Address();
                     rightsibling->children[i] = nullptr;
                 }
                 rightsibling->children[rightsibling->size] = nullptr;
 
                 delete[] rightsibling->key;
                 delete[] rightsibling->children;
+                delete[] rightsibling->address;
                 delete rightsibling;
                 return;
 
@@ -535,7 +586,6 @@ public:
             return;
         }
     }
-
     void removeParent(Node<T>* node, int index, Node<T>* par){
         Node<T>* remover = node;
         Node<T>* cursor = par;
@@ -734,6 +784,7 @@ public:
             }
             delete[] cursor->key;
             delete[] cursor->children;
+            delete[] cursor->address;
             delete cursor;
         }
     }
