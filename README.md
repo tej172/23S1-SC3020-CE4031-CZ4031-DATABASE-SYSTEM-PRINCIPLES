@@ -1,10 +1,8 @@
-Certainly! Here's the formatted content for your README:
-
 # 23S1-SC3020-CE4031-CZ4031-DATABASE-SYSTEM-PRINCIPLES
 
 ## SC3020/CZ4031 - Database Systems Principles
 
-### AY 2022/2023, Semester 1
+### AY 2023/2024, Semester 1
 
 **Project 1 Submission**  
 **GroupID: 31**
