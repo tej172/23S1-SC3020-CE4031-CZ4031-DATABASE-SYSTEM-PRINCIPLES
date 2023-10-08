@@ -858,6 +858,7 @@ public:
 
     std::vector<Address> delKeyRange(float startKey, float endKey)
     {
+        std::cout << "\n\n:::Deletion of records STARTING....:::\n";
 
         std::vector<Address> delValues;
 
@@ -920,6 +921,8 @@ public:
                             remove(floatVector[m]);
                             
                         }
+                        std::cout << "[Num. of records deleted: " <<delCount<<  "]\n";
+                        std::cout << ":::Deletion of records COMPLETED....:::\n\n";
                         return delValues;
                     }
                 }
@@ -932,8 +935,8 @@ public:
         
         //}
 
-        std::cout << "\nkeepDeleting(BOOL) IS:: "<< keepDeleting << "\n";
-        std::cout << "FINAL COUNT IS: " << delCount << "\n";
+        // std::cout << "\nkeepDeleting(BOOL) IS:: "<< keepDeleting << "\n";
+        // std::cout << "FINAL COUNT IS: " << delCount << "\n";
 
         for (int i = 0; i < floatVector.size(); i++)
         {
@@ -941,6 +944,8 @@ public:
 
             remove(floatVector[i]);
         }
+        std::cout << "[Num. of records deleted: " << delCount << "]\n";
+        std::cout << ":::Deletion of records COMPLETED....:::\n\n";
         return delValues;
     }
 
