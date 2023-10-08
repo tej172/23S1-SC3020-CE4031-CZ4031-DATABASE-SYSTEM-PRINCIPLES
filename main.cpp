@@ -292,9 +292,9 @@ int main(){
 	// Node<float> *val_temp = Bptree.findFirstMostNode();
 	// cout << "LEFTMOST value:: " << val_temp->key[0]<< endl;
 
-	cout << "\n\n:::Deletion of records STARTING....:::" << endl;
+	//cout << "\n\n:::Deletion of records STARTING....:::" << endl;
 	int numOfDeleted = Bptree.delKeyRange(0, 0.35);
-	cout << ":::Deletion of records COMPLETED....:::\n\n" << endl;
+	//cout << ":::Deletion of records COMPLETED....:::\n\n" << endl;
 	cout << "No. of deleted records are: "<< numOfDeleted << endl;
 
 	vector<Address> resTotalAfter = Bptree.findKeyRange(-10, 10);
