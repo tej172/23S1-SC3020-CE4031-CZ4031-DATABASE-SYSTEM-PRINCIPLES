@@ -11,6 +11,6 @@
 | ---------------------------- | ------------ | ---------------------------------------------- |
 | Joanne Christina Salimin      | (U21020304J) | Retrieval, Insertion (B+ Tree Implementation, Experiment 4-5) |
 | Priscilla Celine Setiawan    | (U2123732G)  | Storage (Storage Implementation, Experiment 1-3)               |
-| Teg Tiwana Singh              | (U2122816B)  | Deletion(B+ Tree Implementation, Experiment 4-5)               |
+| Teg Tiwana Singh              | (U2122816B)  | Retrieval, Deletion(B+ Tree Implementation, Experiment 4-5)               |
 | Muhammad Rafi Adzikra Sujai  | (U2120731G)  | Storage (Storage Implementation)                                 |
 
