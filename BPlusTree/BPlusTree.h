@@ -755,7 +755,7 @@ public:
             }
             std::cout << "\n";
 
-            if (!cursor->isLeaf) {
+            if (!delKeyRange->isLeaf) {
                 for (int i = 0; i < cursor->size + 1; ++i) {
                     print(cursor->children[i]);
                 }
@@ -856,7 +856,7 @@ public:
     //     }
     // }
 
-    int delKeyRange(float startKey, float endKey)
+    std::vector<Address> delKeyRange(float startKey, float endKey)
     {
         std::cout << "\n\n:::Deletion of records STARTING....:::\n";
 
@@ -922,7 +922,7 @@ public:
                             
                         }
                         std::cout << ":::Deletion of records COMPLETED....:::\n\n";
-                        return delCount;
+                        return delValues;
                     }
                 }
             }
@@ -944,7 +944,7 @@ public:
             remove(floatVector[i]);
         }
         std::cout << ":::Deletion of records COMPLETED....:::\n\n";
-        return delCount;
+        return delValues;
     }
 
   Node<float> * findCorrectNodeForKey(float searchKey, Node<T>* rootPtr = nullptr){

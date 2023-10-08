@@ -265,7 +265,6 @@ int main(){
 	*/
 	cout << "\nExperiment 5: Delete Movies with attr “FG_PCT_home” below 0.35 inclusively (0,0.35]:: \n" << endl;
 
-
 	//Before deleting movies
 	int exp5_numNodes_beforeDel = Bptree.countNodes(Bptree.getroot());
 	int exp5_numLevels_beforeDel = Bptree.countLevels(Bptree.getroot());
@@ -276,11 +275,10 @@ int main(){
 	{
 		output_beforeDel << cursor_beforeDel->key[i] << " ";
 	}
-	std::cout << "::Before Deleting Movies:: Experiment 5 Statistics (B+ Tree):" << endl;
+	std::cout << "::Before Deleting:: Experiment 5 Statistics (B+ Tree):" << endl;
 	std::cout << "Parameter 'n' of the B+ Tree: " << Bptree.getN() << endl;
 	std::cout << "Number of Nodes in the B+ Tree: " << exp5_numNodes_beforeDel << endl;
-	std::cout << "Number of Levels in the B+ Tree(ROOT is counted as **LEVEL 1**): " << exp5_numLevels_beforeDel << endl;
-	std::cout << "Number of Levels in the B+ Tree(ROOT is  counted as **LEVEL 0**): " << (exp5_numLevels_RootIsLevel0_beforeDel) << endl;
+	std::cout << "Number of Levels in the B+ Tree: " << exp5_numLevels_beforeDel << endl;
 	std::cout << "Content of the root node (only the keys): " << output_beforeDel.str() << std::endl;
 	std::cout << endl;
 
@@ -291,18 +289,14 @@ int main(){
 	cout << "No. of Records to Delete:: BEFORE DELETE ::: " << resCheck.size() << endl;
 	// Node<float> *val_temp = Bptree.findFirstMostNode();
 	// cout << "LEFTMOST value:: " << val_temp->key[0]<< endl;
-
-	//cout << "\n\n:::Deletion of records STARTING....:::" << endl;
-	int numOfDeleted = Bptree.delKeyRange(0, 0.35);
-	//cout << ":::Deletion of records COMPLETED....:::\n\n" << endl;
-	cout << "No. of deleted records are: "<< numOfDeleted << endl;
-
-	vector<Address> resTotalAfter = Bptree.findKeyRange(-10, 10);
-	cout << "TOTAL RECORD COUNT:: AFTER DELETE ::: the record count after delete is: " << resTotalAfter.size() << endl;
-	vector<Address> resAfter = Bptree.findKeyRange(0, 0.35);
-	cout << "No. of Records LEFT to Delete:: AFTER DELETE ::: " << resAfter.size() <<"\n" <<endl;
-
 	
+	auto start6 = high_resolution_clock::now();
+	vector<Address> numOfDeleted = Bptree.delKeyRange(0, 0.35);
+	for (int i=0; i<numOfDeleted.size();i++){
+		disk.deleteRecord(numOfDeleted[i], sizeof(recordStruct));	
+	}
+	auto end6 = high_resolution_clock::now();
+	auto duration6 = duration_cast<microseconds>(end5 - start5);
 
 	int exp5_numNodes_afterDel = Bptree.countNodes(Bptree.getroot());
 	int exp5_numLevels_afterDel = Bptree.countLevels(Bptree.getroot());
@@ -313,12 +307,38 @@ int main(){
 	{
 		output_afterDel << cursor_afterDel->key[i] << " ";
 	}
-	cout << "::After Deleting Movies:: Experiment 5 Statistics (B+ Tree):" << endl;
+
+	cout << "::After Deleting:: Experiment 5 Statistics (B+ Tree): \n" << endl;
 	cout << "Parameter 'n' of the B+ Tree: " << Bptree.getN() << endl;
 	cout << "Number of Nodes in the B+ Tree: " << exp5_numNodes_afterDel << endl;
-	cout << "Number of Levels in the B+ Tree(ROOT is counted as **LEVEL 1**): " << exp5_numLevels_afterDel << endl;
-	cout << "Number of Levels in the B+ Tree(ROOT is  counted as **LEVEL 0**): " << (exp5_numLevels_RootIsLevel0_afterDel) << endl;
+	cout << "Number of Levels in the B+ Tree): " << exp5_numLevels_afterDel << endl;
 	std::cout << "Content of the root node (only the keys): " << output_afterDel.str() << std::endl;
+	cout << "Time taken for deletion: " << duration6.count() << " microseconds" << endl;
+	cout << endl;
+	
+
+	// Experiment 5 Brute-force delete method
+	auto start7 = high_resolution_clock::now();
+	int numDataBlocksAccessedBruteForce5 = 0;
+	for (int i = 0; i < numBlocks; ++i) {
+		Address address = {i, 0};
+		for (int j = 0; j < numRecordsInBlock; ++j) {
+			recordStruct* record = static_cast<recordStruct*>(disk.loadDataFromDisk(address, sizeof(recordStruct)));
+			if (record->FG_PCT_home <= 0.35 ){
+				disk.deleteRecord(address, sizeof(recordStruct));
+			}
+			numDataBlocksAccessedBruteForce5++;
+
+			address.offset += sizeof(recordStruct);
+		}
+	}
+	auto end7 = high_resolution_clock::now();
+	auto duration7 = duration_cast<microseconds>(end5 - start5);
+
+	//Report Experiment 5 Brute-Force Linear Deletion Statistics
+	cout << "Experiment 5 Brute-Force Deletion Statistics:" << endl;
+	cout << "Number of Data Blocks Accessed (Brute Force): " << numDataBlocksAccessedBruteForce5 << endl;
+	cout << "Running Time (Brute Force): " << duration7.count() << " microseconds"<< endl;
 	cout << endl;
 
 	return 0;
