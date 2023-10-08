@@ -1036,8 +1036,10 @@ public:
             return 0;
         }
         int count = 1;
-        for (int i = 0; i <= node->size; i++) {
-            count += countNodes(node->children[i]);
+        if (node->isLeaf == false){
+            for (int i = 0; i < node->size; i++) {
+                count += countNodes(node->children[i]);
+            }
         }
         return count;
     }
@@ -1047,14 +1049,12 @@ public:
         if (node == nullptr) {
             return 0;
         }
-        int maxChildLevels = 0;
-        for (int i = 0; i <= node->size; i++) {
-            int childLevels = countLevels(node->children[i]);
-            if (childLevels > maxChildLevels) {
-                maxChildLevels = childLevels;
-            }
+        int count = 1;
+        if (node->isLeaf == false){
+            count += countLevels(node->children[0]);
+
         }
-        return 1 + maxChildLevels;
+        return count;
     }
 
     int getN(){
