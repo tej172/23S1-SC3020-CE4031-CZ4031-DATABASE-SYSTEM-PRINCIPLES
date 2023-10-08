@@ -32,8 +32,6 @@ int main(){
 	int sizeofrecord = 0;
 
 	BPlusTree<float> BPtree = BPlusTree<float>(11);
-
-	//ad_ex5
 	BPlusTree<float> Bptree = BPlusTree<float>(34);
 
 	ifstream inputFile("Data/games.txt");
