@@ -265,7 +265,6 @@ int main(){
 	*/
 	cout << "\nExperiment 5: Delete Movies with attr “FG_PCT_home” below 0.35 inclusively (0,0.35]:: \n" << endl;
 
-
 	//Before deleting movies
 	int exp5_numNodes_beforeDel = Bptree.countNodes(Bptree.getroot());
 	int exp5_numLevels_beforeDel = Bptree.countLevels(Bptree.getroot());
@@ -298,13 +297,6 @@ int main(){
 	}
 	auto end6 = high_resolution_clock::now();
 	auto duration6 = duration_cast<microseconds>(end5 - start5);
-	// vector<Address> resAfter = BPtree.findKeyRange(0, 0.35);
-
-	//vector<Address> resAfter = Bptree.findKeyRange(0, 0.35);
-	//cout << "AFTER DELETE ::: the record count is: " << resAfter.size()<< endl;
-
-	// vector<Address> resTotalAfter = Bptree.findKeyRange(-10, 10);
-	// cout << "TOTAL REC COUNT:: AFTER DELETE ::: the record count is: " << resTotalAfter.size() << endl;
 
 	int exp5_numNodes_afterDel = Bptree.countNodes(Bptree.getroot());
 	int exp5_numLevels_afterDel = Bptree.countLevels(Bptree.getroot());
@@ -316,13 +308,39 @@ int main(){
 		output_afterDel << cursor_afterDel->key[i] << " ";
 	}
 
-	cout << "::After Deleting:: Experiment 5 Statistics (B+ Tree):" << endl;
+	cout << "::After Deleting:: Experiment 5 Statistics (B+ Tree): \n" << endl;
 	cout << "Parameter 'n' of the B+ Tree: " << Bptree.getN() << endl;
 	cout << "Number of Nodes in the B+ Tree: " << exp5_numNodes_afterDel << endl;
 	cout << "Number of Levels in the B+ Tree): " << exp5_numLevels_afterDel << endl;
 	std::cout << "Content of the root node (only the keys): " << output_afterDel.str() << std::endl;
 	cout << "Time taken for deletion: " << duration6.count() << " microseconds" << endl;
 	cout << endl;
+	
+
+	// Experiment 5 Brute-force delete method
+	auto start7 = high_resolution_clock::now();
+	int numDataBlocksAccessedBruteForce5 = 0;
+	for (int i = 0; i < numBlocks; ++i) {
+		Address address = {i, 0};
+		for (int j = 0; j < numRecordsInBlock; ++j) {
+			recordStruct* record = static_cast<recordStruct*>(disk.loadDataFromDisk(address, sizeof(recordStruct)));
+			if (record->FG_PCT_home <= 0.35 ){
+				disk.deleteRecord(address, sizeof(recordStruct));
+			}
+			numDataBlocksAccessedBruteForce5++;
+
+			address.offset += sizeof(recordStruct);
+		}
+	}
+	auto end7 = high_resolution_clock::now();
+	auto duration7 = duration_cast<microseconds>(end5 - start5);
+
+	//Report Experiment 5 Brute-Force Linear Deletion Statistics
+	cout << "Experiment 5 Brute-Force Deletion Statistics:" << endl;
+	cout << "Number of Data Blocks Accessed (Brute Force): " << numDataBlocksAccessedBruteForce5 << endl;
+	cout << "Running Time (Brute Force): " << duration7.count() << " microseconds"<< endl;
+	cout << endl;
+
 	return 0;
 
 }
