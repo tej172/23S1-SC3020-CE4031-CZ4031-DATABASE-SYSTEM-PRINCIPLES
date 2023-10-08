@@ -243,7 +243,7 @@ int main(){
 	auto end5 = high_resolution_clock::now();
 	auto duration5 = duration_cast<microseconds>(end5 - start5);
 
-	// Report Experiment 4 Brute-Force Linear Scan Statistics
+	//Report Experiment 4 Brute-Force Linear Scan Statistics
 	cout << "Experiment 4 Brute-Force Linear Scan Statistics:" << endl;
 	cout << "Number of Data Blocks Accessed (Brute Force): " << numDataBlocksAccessedBruteForce4 << endl;
 	cout << "Running Time (Brute Force): " << duration5.count() << " microseconds"<< endl;
@@ -252,20 +252,14 @@ int main(){
 
 
 	// Experiment 5 delete:
-	cout << "Experiment 5 Delete Nodes:" << endl;
-	vector<Address> res = BPtree.findKeyRange(0, 0.35);
-
-	cout << "the record count to delete is: " << res.size()<< endl;
-	Node<float> * val_temp = BPtree.findFirstMostNode();
-
-	cout << "LEFTMOST value:: " << val_temp->key[0]<< endl;
 	int numOfDeleted =  BPtree.delKeyRange(0, 0.35);
 
-	cout << "No. of deleted records are: "<< numOfDeleted << endl;
-	vector<Address> resAfter = BPtree.findKeyRange(0, 0.35);
+	// cout << "No. of deleted records are: "<< numOfDeleted << endl;
+	// vector<Address> resAfter = BPtree.findKeyRange(0, 0.35);
 
-	cout << "AFTER DELETE ::: the record count is: " << resAfter.size()<< endl;
+	// cout << "AFTER DELETE ::: the record count is: " << resAfter.size()<< endl;
 
 	return 0;
+
 }
 #endif
