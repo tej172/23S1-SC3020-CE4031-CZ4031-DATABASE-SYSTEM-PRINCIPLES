@@ -23,9 +23,16 @@ using namespace std :: chrono;
 int main(){
 	Disk disk = Disk(400, 300000000);
 
-	BPlusTree<float> BPtree = BPlusTree<float>(34);
-	int countRecord = 0;
-	float smallestRecord = 10000;
+	// vector<recordStruct> record;
+
+
+	int numRecords = 0;
+    size_t totalRecordSize = 0;
+	int recordsInCurrentBlock = 0;
+	int sizeofrecord = 0;
+
+	BPlusTree<float> BPtree = BPlusTree<float>(11);
+
     ifstream inputFile("Data/games.txt");
 	
     if (!inputFile.is_open()) {
@@ -247,26 +254,17 @@ int main(){
 	// Experiment 5 delete:
 	cout << "Experiment 5 Delete Nodes:" << endl;
 	vector<Address> res = BPtree.findKeyRange(0, 0.35);
-	std::cout << "the record count to delete is: " << res.size();
 
-	BPtree.findRootNodeValue();
-
-	int treeHeight = BPtree.findHeight();
-	std::cout << "\ntree height is:: " << treeHeight << "\n"; // Get the height of the tree.
-	
-
-
-	int numNodes = BPtree.countNodes();
-	std::cout << "number of nodes are:: " << numNodes << "\n"; // Get the number of nodes in the tree.
+	cout << "the record count to delete is: " << res.size()<< endl;
 	Node<float> * val_temp = BPtree.findFirstMostNode();
-	// std::cout << "\nLEFTMOST value:: " << val_temp->key[0];
 
-	// int numOfDeleted =  BPtree.delKeyRange(0, 0.35);
+	cout << "LEFTMOST value:: " << val_temp->key[0]<< endl;
+	int numOfDeleted =  BPtree.delKeyRange(0, 0.35);
 
-	// std::cout << "\n No. of deleted records are: " << numOfDeleted << "\n";
+	cout << "No. of deleted records are: "<< numOfDeleted << endl;
+	vector<Address> resAfter = BPtree.findKeyRange(0, 0.35);
 
-	// vector<Address> resAfter = BPtree.findKeyRange(0, 0.35);
-	// std::cout << "AFTER DELETE ::: the record count is: " << resAfter.size();
+	cout << "AFTER DELETE ::: the record count is: " << resAfter.size()<< endl;
 
 	return 0;
 }

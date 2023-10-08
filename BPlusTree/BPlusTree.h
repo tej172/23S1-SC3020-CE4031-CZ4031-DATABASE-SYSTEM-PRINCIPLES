@@ -56,6 +56,7 @@ public:
     }
 
     Node<T>* getroot(){
+        accessedNodesCount++;
         return this->root;
     }
 
@@ -959,13 +960,13 @@ public:
         while (searchPtr->isLeaf == false){
             //traverse through each visited node
             for (int i=0; i< searchPtr->size; i++){
-                accessedNodesCount++;
                 // std::cout << "accessedNodesCount: " << accessedNodesCount << " \n";
                 // std::cout << "accessedNodesCount " << accessedNodesCount  << " \n";
                 //std::cout << "[SEARCHING INTERNAL NODE] Node Key: " << searchPtr->keys[i] << ", searchKey: " << searchKey << " \n";
                 if (searchKey < searchPtr->key[i]){
                     //std::cout << "[INTERNAL NODE FOUND] < searchKey. Key: " << searchPtr->keys[i] << ", searchKey: " << searchKey << " \n";
                     searchPtr = searchPtr->children[i];
+                    accessedNodesCount++;
                     break;
                 }
 
@@ -977,6 +978,8 @@ public:
 
                     leftNode = findCorrectNodeForKey(searchKey, leftNode);
                     rightNode = findCorrectNodeForKey(searchKey, rightNode);
+                    accessedNodesCount++;
+                    accessedNodesCount++;
 
                     searchPtr = (leftNode == nullptr && rightNode == nullptr) ? nullptr :
                                 (leftNode != nullptr && rightNode == nullptr) ? leftNode :
@@ -988,6 +991,7 @@ public:
                 if (i == searchPtr->size - 1){
                     //std::cout << "[NODE FOUND] >= searchKey. Key: " << searchPtr->keys[i] << ", searchKey: " << searchKey << " \n";
                     searchPtr = searchPtr->children[i+1];
+                    accessedNodesCount++;
                     break;
                 }
             }  
@@ -996,11 +1000,12 @@ public:
         return searchPtr;
   };
   std::vector<Address> findKeyRange(float startKey, float endKey){
+    accessedNodesCount = 0;
     Node<float> * currNode = findCorrectNodeForKey(startKey, getroot());
     bool keepSearching = true;
     std::vector<Address> vec;
     int count = 0;
-
+    accessedNodesCount++;
     if(currNode != nullptr){
         for (int i=0; i< currNode->size; i++){
             if (currNode->key[i] >= startKey && currNode->key[i] <= endKey){
@@ -1016,6 +1021,7 @@ public:
     while (keepSearching){
         if ( currNode->children[currNode->size] != nullptr){
             currNode = currNode->children[currNode->size];
+            accessedNodesCount++;
             for (int i=0; i< currNode->size; i++){
                 if (currNode->key[i] >= startKey && currNode->key[i] <= endKey){
                     vec.push_back(currNode->address[i]);
@@ -1037,7 +1043,7 @@ public:
         }
         int count = 1;
         if (node->isLeaf == false){
-            for (int i = 0; i < node->size; i++) {
+            for (int i = 0; i <= node->size; i++) {
                 count += countNodes(node->children[i]);
             }
         }
