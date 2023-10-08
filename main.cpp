@@ -33,7 +33,10 @@ int main(){
 
 	BPlusTree<float> BPtree = BPlusTree<float>(11);
 
-    ifstream inputFile("Data/games.txt");
+	//ad_ex5
+	BPlusTree<float> Bptree = BPlusTree<float>(34);
+
+	ifstream inputFile("Data/games.txt");
 	
     if (!inputFile.is_open()) {
         cerr << "Error: Unable to open input file." << endl;
@@ -95,6 +98,10 @@ int main(){
 
     
 		BPtree.insert(record.FG_PCT_home, address);
+		Bptree.insert(record.FG_PCT_home, address);
+
+
+
         // Update statistics
         ++numRecords;
 		++recordsInCurrentBlock;
@@ -131,7 +138,7 @@ int main(){
 	cout << endl;
 
 
-	  // Experiment 3: Retrieve movies with FG_PCT_home equal to 0.5
+	// Experiment 3: Retrieve movies with FG_PCT_home equal to 0.5
 
 	float targetFGPCT = 0.5;
 	auto start = high_resolution_clock::now();
@@ -252,12 +259,24 @@ int main(){
 
 
 	// Experiment 5 delete:
-	int numOfDeleted =  BPtree.delKeyRange(0, 0.35);
+	cout << "Experiment 5 Delete Nodes:" << endl;
+	vector<Address> res = Bptree.findKeyRange(0, 0.35);
 
-	// cout << "No. of deleted records are: "<< numOfDeleted << endl;
+	//djskdj
+	vector<Address> resTotalBefore = Bptree.findKeyRange(0, 1);
+	cout << "TOTAL REC COUNT:: BEFORE DELETE ::: the record count is: " << resTotalBefore.size() << endl;
+	//
+	cout << "the record count to delete is: " << res.size()<< endl;
+	Node<float> *val_temp = Bptree.findFirstMostNode();
+
+	cout << "LEFTMOST value:: " << val_temp->key[0]<< endl;
+	int numOfDeleted = Bptree.delKeyRange(0, 0.35);
+
+	cout << "No. of deleted records are: "<< numOfDeleted << endl;
 	// vector<Address> resAfter = BPtree.findKeyRange(0, 0.35);
 
-	// cout << "AFTER DELETE ::: the record count is: " << resAfter.size()<< endl;
+	vector<Address> resAfter = Bptree.findKeyRange(0, 0.35);
+	cout << "AFTER DELETE ::: the record count is: " << resAfter.size()<< endl;
 
 	return 0;
 

@@ -859,12 +859,89 @@ public:
     int delKeyRange(float startKey, float endKey)
     {
 
-        std::vector<float> vec = findKeyRangeReturnFloat(startKey, endKey);
-        std::cout << vec.size() << "   ";
-        for (int i=0; i< 5790; i++){
-            remove(vec[i]);
-            break;
+        std::vector<Address> delValues;
+
+        delValues = findKeyRange(startKey, endKey);
+
+        Node<float> *currNode = findCorrectNodeForKey(startKey, getroot());
+        bool keepDeleting = true;
+        std::vector<float> floatVector;
+        int delCount=0;
+
+        //std::cout << "\nCOUNT 1 IS: " << delCount << "\n";
+
+        //for (int i=0; i< delValues.size(); i++){
+            //remove(delValues[i]);
+            //std::cout << "VALUE IS: " << delValues.size();
+        
+        if (currNode != nullptr)
+        {
+            for (int j = 0; j < currNode->size; j++)
+            {
+                if (currNode->key[j] >= startKey && currNode->key[j] <= endKey)
+                {
+                    //std::cout << "\nkey " << j << "  is " << currNode->key[j];
+                    //remove(currNode->key[j]);
+                    floatVector.push_back(currNode->key[j]);
+                    delCount++;
+                    keepDeleting = true;
+                }
+                else
+                {
+                    keepDeleting = false;
+                }
+            }
         }
+        //std::cout << "\nCOUNT 2 IS: " << delCount << "\n";
+
+        while (keepDeleting == true)
+        {
+            if (currNode->children[currNode->size] != nullptr){
+                currNode = currNode->children[currNode->size];
+                for (int i = 0; i < currNode->size; i++)
+                {
+                    if (currNode->key[i] >= startKey && currNode->key[i] <= endKey)
+                    {
+                        //std::cout << "\nkey "<<i<< "  is " << currNode->key[i];
+                        floatVector.push_back(currNode->key[i]);
+
+                        //remove(currNode->key[i]);
+
+                        delCount++;
+                    }
+                    else
+                    {
+                        keepDeleting = false;
+                        std::cout<<"no work";
+
+                        for (int m = 0; m < floatVector.size(); m++)
+                        {
+                            //std::cout << "m:" << floatVector[m] << " ";
+                            remove(floatVector[m]);
+                            
+                        }
+                        return delCount;
+                    }
+                }
+            }
+            /* code */
+            else{
+                keepDeleting = false;
+            }
+        }
+        
+        //}
+
+        std::cout << "\nkeepDeleting(BOOL) IS:: "<< keepDeleting << "\n";
+        std::cout << "FINAL COUNT IS: " << delCount << "\n";
+
+        for (int i = 0; i < floatVector.size(); i++)
+        {
+            //std::cout << "i:" << floatVector[i] << " ";
+
+            remove(floatVector[i]);
+        }
+        return delCount;
     }
 
   Node<float> * findCorrectNodeForKey(float searchKey, Node<T>* rootPtr = nullptr){
