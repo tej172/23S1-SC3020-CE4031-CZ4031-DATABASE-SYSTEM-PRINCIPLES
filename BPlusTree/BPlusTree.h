@@ -842,8 +842,8 @@ public:
             currNode = currNode->children[0];
         }
 
-        std::cout << "\nLEFTMOST VALUE::  " << currNode->key[0] << "\n";
-        std::cout << "\nTREEE HEIGHTT::  " << countHeight << "\n";
+        // std::cout << "\nLEFTMOST VALUE::  " << currNode->key[0] << "\n";
+        // std::cout << "\nTREEE HEIGHTT::  " << countHeight << "\n";
         //return currNode->item[0];
         return currNode;
 
@@ -912,7 +912,7 @@ public:
                     else
                     {
                         keepDeleting = false;
-                        std::cout<<"no work";
+                        //std::cout<<"no work";
 
                         for (int m = 0; m < floatVector.size(); m++)
                         {
