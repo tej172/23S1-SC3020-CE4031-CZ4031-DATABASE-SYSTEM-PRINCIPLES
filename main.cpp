@@ -104,7 +104,7 @@ int main(){
   	inputFile.close(); // Close the input file after processing
 	const size_t blockSize = 400; 
 	size_t numRecordsInBlock = blockSize / sizeof(recordStruct);
-  	int numBlocks = numRecords/numRecordsInBlock;
+  	int numBlocks = disk.BlockUsed();
     // Report the statistics for Experiment 1
     cout << "Experiment 1 Statistics:" << endl;
     cout << "Number of Records: " << numRecords << endl;

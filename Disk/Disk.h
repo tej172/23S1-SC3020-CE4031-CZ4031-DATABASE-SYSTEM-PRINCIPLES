@@ -16,6 +16,11 @@ class Disk {
             this->block = startDisk;
             this->currBlockMemUsed = 0;
         }
+
+        int BlockUsed(){
+            return currBlockNumber+1;
+        }
+
         bool deleteRecord(Address address, size_t sizeToDelete) {
             try {
                 void* addressToDelete = (char*)startDisk + address.blkNumber * blockSize + address.offset;
@@ -101,6 +106,7 @@ class Disk {
             Address record = { currBlockNumber, offset };
             return record;
         }
+
 };
 
 
