@@ -921,6 +921,7 @@ public:
                             remove(floatVector[m]);
                             
                         }
+                        std::cout << "[Num. of records deleted: " <<delCount<<  "]\n";
                         std::cout << ":::Deletion of records COMPLETED....:::\n\n";
                         return delValues;
                     }
@@ -943,6 +944,7 @@ public:
 
             remove(floatVector[i]);
         }
+        std::cout << "[Num. of records deleted: " << delCount << "]\n";
         std::cout << ":::Deletion of records COMPLETED....:::\n\n";
         return delValues;
     }

@@ -133,7 +133,7 @@ int main(){
     cout << "Parameter 'n' of the B+ Tree: " << BPtree.getN() << endl;
     cout << "Number of Nodes in the B+ Tree: " << numNodes << endl;
     cout << "Number of Levels in the B+ Tree(root is counted as **LEVEL 1**): " <<numLevels << endl;
-	cout << "Number of Levels in the B+ Tree(root is  counted as **LEVEL 0**): " << (numLevels_RootIsLevel0) << endl;
+	//cout << "Number of Levels in the B+ Tree(root is  counted as **LEVEL 0**): " << (numLevels_RootIsLevel0) << endl;
 	std::cout << "Content of the root node (only the keys): " << output.str() << std::endl;
 	cout << endl;
 
@@ -263,7 +263,7 @@ int main(){
 		Delete those movies with the attribute
 		“FG_PCT_home” below 0.35 inclusively (0,0.35]
 	*/
-	cout << "\nExperiment 5: Delete Movies with attr “FG_PCT_home” below 0.35 inclusively (0,0.35]:: \n" << endl;
+	cout << "\nExperiment 5: Delete Records with attr FG_PCT_home below 0.35 inclusively (0,0.35]:: \n" << endl;
 
 	//Before deleting movies
 	int exp5_numNodes_beforeDel = Bptree.countNodes(Bptree.getroot());
@@ -278,18 +278,19 @@ int main(){
 	std::cout << "::Before Deleting:: Experiment 5 Statistics (B+ Tree):" << endl;
 	std::cout << "Parameter 'n' of the B+ Tree: " << Bptree.getN() << endl;
 	std::cout << "Number of Nodes in the B+ Tree: " << exp5_numNodes_beforeDel << endl;
-	std::cout << "Number of Levels in the B+ Tree: " << exp5_numLevels_beforeDel << endl;
-	std::cout << "Content of the root node (only the keys): " << output_beforeDel.str() << std::endl;
+	std::cout << "Number of Levels in the B+ Tree(root is counted as **LEVEL 1**): " << exp5_numLevels_beforeDel << endl;
+	std::cout << "Content of the root node (only the keys): " << output_beforeDel.str() << std::endl; 
 	std::cout << endl;
 
 	//Deletion Section
 	vector<Address> resTotalBefore = Bptree.findKeyRange(-10, 10);
 	cout << "TOTAL RECORD COUNT:: BEFORE DELETE ::: the record count is: " << resTotalBefore.size() << endl;
 	vector<Address> resCheck = Bptree.findKeyRange(0, 0.35);
-	cout << "No. of Records to Delete:: BEFORE DELETE ::: " << resCheck.size() << endl;
+	cout << "::BEFORE DELETE:: No. of Records to Delete: " << resCheck.size() << endl;
+
 	// Node<float> *val_temp = Bptree.findFirstMostNode();
 	// cout << "LEFTMOST value:: " << val_temp->key[0]<< endl;
-	
+
 	auto start6 = high_resolution_clock::now();
 	vector<Address> numOfDeleted = Bptree.delKeyRange(0, 0.35);
 	for (int i=0; i<numOfDeleted.size();i++){
@@ -308,11 +309,16 @@ int main(){
 		output_afterDel << cursor_afterDel->key[i] << " ";
 	}
 
-	cout << "::After Deleting:: Experiment 5 Statistics (B+ Tree): \n" << endl;
-	cout << "Parameter 'n' of the B+ Tree: " << Bptree.getN() << endl;
-	cout << "Number of Nodes in the B+ Tree: " << exp5_numNodes_afterDel << endl;
-	cout << "Number of Levels in the B+ Tree): " << exp5_numLevels_afterDel << endl;
-	std::cout << "Content of the root node (only the keys): " << output_afterDel.str() << std::endl;
+	vector<Address> resTotalAfter = Bptree.findKeyRange(-10, 10);
+	cout << "TOTAL RECORD COUNT:: AFTER DELETE ::: the record count is: " << resTotalAfter.size() << endl;
+	vector<Address> resCheck_AfterDel = Bptree.findKeyRange(0, 0.35);
+	cout << "::AFTER DELETE:: No. of Records LEFT to Delete: " << resCheck_AfterDel.size() << "\n"<< endl;
+
+	cout << "::After Deleting:: Experiment 5 Statistics (B+ Tree): " << endl;
+	cout << "Parameter 'n' of the UPDATED B+ Tree: " << Bptree.getN() << endl;
+	cout << "Number of Nodes in the UPDATED B+ Tree: " << exp5_numNodes_afterDel << endl;
+	cout << "Number of Levels in the UPDATED B+ Tree(root is counted as **LEVEL 1**): " << exp5_numLevels_afterDel << endl;
+	std::cout << "Content of the UPDATED B+ tree root node (only the keys): " << output_afterDel.str() << std::endl;
 	cout << "Time taken for deletion: " << duration6.count() << " microseconds" << endl;
 	cout << endl;
 	
