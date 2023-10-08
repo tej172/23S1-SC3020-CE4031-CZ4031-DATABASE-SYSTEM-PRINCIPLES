@@ -296,7 +296,7 @@ int main(){
 		disk.deleteRecord(numOfDeleted[i], sizeof(recordStruct));	
 	}
 	auto end6 = high_resolution_clock::now();
-	auto duration6 = duration_cast<microseconds>(end5 - start5);
+	auto duration6 = duration_cast<microseconds>(end6 - start6);
 
 	int exp5_numNodes_afterDel = Bptree.countNodes(Bptree.getroot());
 	int exp5_numLevels_afterDel = Bptree.countLevels(Bptree.getroot());
@@ -333,7 +333,7 @@ int main(){
 		}
 	}
 	auto end7 = high_resolution_clock::now();
-	auto duration7 = duration_cast<microseconds>(end5 - start5);
+	auto duration7 = duration_cast<microseconds>(end7 - start7);
 
 	//Report Experiment 5 Brute-Force Linear Deletion Statistics
 	cout << "Experiment 5 Brute-Force Deletion Statistics:" << endl;
