@@ -284,26 +284,25 @@ int main(){
 	std::cout << "Content of the root node (only the keys): " << output_beforeDel.str() << std::endl;
 	std::cout << endl;
 
-	//
-	// vector<Address> resTotalBefore = Bptree.findKeyRange(0, 1);
-	// cout << "TOTAL REC COUNT:: BEFORE DELETE ::: the record count is: " << resTotalBefore.size() << endl;
-	
-	// //
-	// vector<Address> res = Bptree.findKeyRange(0, 0.35);
-	// cout << "the record count to delete is: " << res.size()<< endl;
-	
+	//Deletion Section
+	vector<Address> resTotalBefore = Bptree.findKeyRange(-10, 10);
+	cout << "TOTAL RECORD COUNT:: BEFORE DELETE ::: the record count is: " << resTotalBefore.size() << endl;
+	vector<Address> resCheck = Bptree.findKeyRange(0, 0.35);
+	cout << "No. of Records to Delete:: BEFORE DELETE ::: " << resCheck.size() << endl;
 	// Node<float> *val_temp = Bptree.findFirstMostNode();
 	// cout << "LEFTMOST value:: " << val_temp->key[0]<< endl;
-	
+
+	cout << "\n\n:::Deletion of records STARTING....:::" << endl;
 	int numOfDeleted = Bptree.delKeyRange(0, 0.35);
+	cout << ":::Deletion of records COMPLETED....:::\n\n" << endl;
 	cout << "No. of deleted records are: "<< numOfDeleted << endl;
-	// vector<Address> resAfter = BPtree.findKeyRange(0, 0.35);
 
-	//vector<Address> resAfter = Bptree.findKeyRange(0, 0.35);
-	//cout << "AFTER DELETE ::: the record count is: " << resAfter.size()<< endl;
+	vector<Address> resTotalAfter = Bptree.findKeyRange(-10, 10);
+	cout << "TOTAL RECORD COUNT:: AFTER DELETE ::: the record count after delete is: " << resTotalAfter.size() << endl;
+	vector<Address> resAfter = Bptree.findKeyRange(0, 0.35);
+	cout << "No. of Records LEFT to Delete:: AFTER DELETE ::: " << resAfter.size() <<"\n" <<endl;
 
-	// vector<Address> resTotalAfter = Bptree.findKeyRange(-10, 10);
-	// cout << "TOTAL REC COUNT:: AFTER DELETE ::: the record count is: " << resTotalAfter.size() << endl;
+	
 
 	int exp5_numNodes_afterDel = Bptree.countNodes(Bptree.getroot());
 	int exp5_numLevels_afterDel = Bptree.countLevels(Bptree.getroot());
